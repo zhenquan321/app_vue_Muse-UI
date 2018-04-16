@@ -9,15 +9,15 @@
   </div>-->
   <div class="demo-infinite-container">
     <mu-list>
-      <template v-for='o,i of list'>
-        <mu-list-item :title="o.title" :describeText="o.author_name" @click='onClick(o)'>
-          <mu-avatar :src="o.thumbnail_pic_s" slot="leftAvatar" />
-        </mu-list-item>
-      </template>
+       <template v-for='o,i of list'>
+          <mu-list-item :title="o.title" :describeText="o.author_name"  @click='onClick(o)'>
+            <mu-avatar :src="o.thumbnail_pic_s" slot="leftAvatar" />
+          </mu-list-item>
+          <mu-divider inset/>
+       </template>
     </mu-list>
     <mu-infinite-scroll :scroller="scroller" :loading="loading" @load="up" :loadingText='""' />
   </div>
-
   <!--<div class="demo-refresh-container">
     <mu-refresh-control :refreshing="refreshing" :trigger="trigger" @refresh="down"/>
     <mu-list>
@@ -38,7 +38,90 @@ import SF from "common/js/App/SFArticle.js";
 export default {
   data() {
     return {
-      list: [],
+      list: [
+        {
+          title:"2018名师讲解训练班：相关法",
+          author_name:'李老虎是',
+          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+          url:"http://s.mysipo.com/course/view/id/672"
+        },
+        {
+          title:"2018名师讲解训练班：相关法",
+          author_name:'李老虎是',
+          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+          url:"http://s.mysipo.com/course/view/id/672"
+        },
+          {
+          title:"2018名师讲解训练班：相关法",
+          author_name:'李老虎是',
+          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+        },
+        {
+          title:"2018名师讲解训练班：相关法",
+          author_name:'李老虎是',
+          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+        },
+         {
+          title:"2018名师讲解训练班：相关法",
+          author_name:'李老虎是',
+          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+        },
+         {
+          title:"2018名师讲解训练班：相关法",
+          author_name:'李老虎是',
+          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+        },
+         {
+          title:"2018名师讲解训练班：相关法",
+          author_name:'李老虎是',
+          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+        },
+         {
+          title:"2018名师讲解训练班：相关法",
+          author_name:'李老虎是',
+          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+        },
+         {
+          title:"2018名师讲解训练班：相关法",
+          author_name:'李老虎是',
+          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+        },
+         {
+          title:"2018名师讲解训练班：相关法",
+          author_name:'李老虎是',
+          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+        },
+         {
+          title:"2018名师讲解训练班：相关法",
+          author_name:'李老虎是',
+          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+        },
+         {
+          title:"2018名师讲解训练班：相关法",
+          author_name:'李老虎是',
+          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+        },
+         {
+          title:"2018名师讲解训练班：相关法",
+          author_name:'李老虎是',
+          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+        },
+         {
+          title:"2018名师讲解训练班：相关法",
+          author_name:'李老虎是',
+          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+        },
+         {
+          title:"2018名师讲解训练班：相关法",
+          author_name:'李老虎是',
+          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+        },
+         {
+          title:"2018名师讲解训练班：相关法",
+          author_name:'李老虎是',
+          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+        },
+      ],
       index: -1,
       loading: false,
       scroller: null
@@ -64,7 +147,7 @@ export default {
       this.cw = plus.webview.currentWebview();
     },
     onClick(item) {
-      let page = "bowser.html",
+      let page = "courseDetails.html",
         ow = plus.webview.create(
           page,
           page,

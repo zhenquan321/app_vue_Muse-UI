@@ -1,8 +1,8 @@
 <template>
-  <div>
-    <mu-appbar :title="tabs[activeIndex].title"  slot="center">
-      <mu-icon-button icon="left" slot="left"/>
-      <mu-icon-button icon='left' slot="right" @click='menu' />
+
+ <div>
+    <mu-appbar :title="tabs[activeIndex].title">
+      <mu-icon-button icon='music' slot="right" />
     </mu-appbar>
     <!-- <mu-paper>
       <mu-bottom-nav :value="activeIndex" shift @change="handleTabChange">
@@ -11,21 +11,22 @@
     </mu-paper> -->
   </div>
 </template>
-
 <script>
   import {
     domReady,
     plusReady
   } from 'common/js/ning/index.js'
+
   import Broadcast from 'common/js/ning/Broadcast.js'
   import webviewGroup from 'common/js/ning/WebviewGroup.js'
+ 
   export default {
     data() {
       return {
         activeIndex: 0,
         tabs: [
           {
-            title: '我的课程',
+            title: '课程列表',
             icon: 'home',
             src: 'home.html'
           },
@@ -42,7 +43,7 @@
         ],
         style: {
           top: '56px',
-          bottom: '0px',
+          bottom: '51px',
           popGesture: 'none'
         },
         isShow: false,
@@ -78,9 +79,9 @@
         })
 
         //默认载入
-        //this.showSubPage(this.activeIndex)
-        // 侧滑初始化
-        //this.menuInit()
+        this.showSubPage(this.activeIndex)
+        //3侧滑初始化
+        this.menuInit()
 
       },
       //左上角菜单
@@ -161,8 +162,16 @@
       },
       hideSubPage(index) {
         plus.webview.hide(this.tabs[this.activeIndex].src)
+      },
+      onGoSp() {
+        let url = 'robot.html',
+          w = plus.webview.create(url, url, {
+            popGesture: 'close'
+          })
+        w.addEventListener('titleUpdate', () => {
+          w.show('pop-in', 250)
+        })
       }
-
     },
     watch: {
       isShow(n) {
@@ -182,8 +191,5 @@
     width: 100%;
     position: fixed;
     bottom: 0;
-  }
-  .mu-appbar{
-    text-align:center;
   }
 </style>

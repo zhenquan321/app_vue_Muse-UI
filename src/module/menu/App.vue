@@ -66,8 +66,6 @@
           }
         ],
 
-
-
         index: 0,
         themes,
         t: null,

@@ -28,5 +28,36 @@ module.exports = {
     // In our experience, they generally work as expected,
     // just be aware of this issue when enabling this option.
     cssSourceMap: false
-  }
+  },
+  module: {
+    rules: [{
+        test: /\.css$/,
+        loader: 'style-loader!css-loader'
+    },
+    {
+        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+        loader: 'url-loader?limit=10000&name=images/[name].[hash:8].[ext]'
+    },
+    {
+        test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
+        loader: 'url-loader?limit=10000&name=fonts/[name].[hash:8].[ext]'
+    },
+    {
+        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
+        loader: 'url-loader?limit=10000&name=media/[name].[hash:8].[ext]'
+    },
+    {
+      test: /\.(ttf|eot|svg|woff(2))(\?[a-z0-9]+)?$/,
+      loader: 'file',
+    },
+    {
+      test: /\.(swf|ttf|eot|svg|woff(2))(\?[a-z0-9]+)?$/,
+      loader: 'file',
+    }]
+},
+
+
+
+
+
 }
