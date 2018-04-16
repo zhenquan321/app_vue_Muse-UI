@@ -30,3 +30,5 @@ npm run build
 ## 然后把 dist 文件下的目录放入 HBuilder 项目中
 ## 设置起始页为 module/index.html 真机调试
 ```
+
+集成vue-video-player
