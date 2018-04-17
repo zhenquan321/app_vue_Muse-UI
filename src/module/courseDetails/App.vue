@@ -67,7 +67,7 @@
   export default {
     data() {
       return {
-        loading: false,
+        loading: true,
         url: '',
         title: '课程详情',
         bw: null,
@@ -178,6 +178,26 @@
         this.title = this.cw.title
         //this.createBowser()
         //this.initBowser()
+        setTimeout(function () { 
+          plus.webview.currentWebview().show('slide-in-right', 250);
+          plus.nativeUI.closeWaiting();
+        }, 300);
+        //视屏旋转
+        if(plus.os.name=="Android"){
+          var self = plus.webview.currentWebview();
+          self.setStyle({
+              videoFullscreen: 'landscape'
+          });
+        }else{
+          // IOS监听的事件
+          videoElem.addEventListener('webkitbeginfullscreen', function() {
+              plus.screen.lockOrientation('landscape'); //锁死屏幕方向为横屏
+          });
+          videoElem.addEventListener('webkitendfullscreen', function() {
+          //  plus.screen.unlockOrientation(); //解除屏幕方向的锁定，但是不一定是竖屏；
+              plus.screen.lockOrientation('portrait'); //锁死屏幕方向为竖屏
+          });
+        }
       },
       close() {
         this.cw.close()
@@ -208,9 +228,7 @@
 </script>
 
 <style lang="css">
-  .mu-appbar{
 
-  }
   /*进度条*/
   .mu-linear-progress{
     position: absolute !important;

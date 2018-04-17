@@ -160,15 +160,13 @@ export default {
           }
         );
       ow.onloading = () => {
-        ow.show("pop-in", 250);
+        plus.nativeUI.showWaiting();
+        // ow.show("pop-in", 250);
       };
     },
     getNetData(isDwon) {
-      let url =
-        "http://v.juhe.cn/toutiao/index?type=top&key=40d3f36de706335e77684e293d10c54a";
-
+      let url = "暂时";
       this.loading = true;
-
       this.$http
         .get(url, {
           // parmas,
@@ -179,9 +177,7 @@ export default {
         .then(
           res => {
             let data = res.body;
-
             data = data.result.data;
-
             this.loading = false;
             if (isDwon) {
               //去重 新数据在前

@@ -1,8 +1,10 @@
 <template>
   <div>
     <mu-appbar :title="tabs[activeIndex].title"  slot="center">
-      <mu-icon-button icon="left" slot="left"/>
-      <mu-icon-button icon='left' slot="right" @click='menu' />
+      <mu-icon-button v-if="activeIndex==0" icon="arrow_back_ios" slot="left" @click='close' />
+      <mu-icon-button v-if="activeIndex==0" icon='menu' slot="right" @click='handleTabChange(1)' />
+      <mu-icon-button v-if="activeIndex==1" icon="arrow_back_ios" slot="left" @click='handleTabChange(0)' />
+      <mu-icon-button v-if="activeIndex==1" icon='' slot="right"  />
     </mu-appbar>
     <!-- <mu-paper>
       <mu-bottom-nav :value="activeIndex" shift @change="handleTabChange">
@@ -29,13 +31,13 @@
             icon: 'home',
             src: 'home.html'
           },
+          // {
+          //   title: '音乐',
+          //   icon: 'touch_app',
+          //   src: 'music.html'
+          // },
           {
-            title: '音乐',
-            icon: 'touch_app',
-            src: 'music.html'
-          },
-          {
-            title: '我的',
+            title: '课程设置',
             icon: 'account_box',
             src: 'menu.html'
           }
@@ -58,9 +60,12 @@
     },
     methods: {
       plusReady() {
+        setTimeout(function () { 
+          plus.webview.currentWebview().show('slide-in-right', 250);
+          plus.nativeUI.closeWaiting();
+        }, 600);
         this.cw = plus.webview.currentWebview()
         let that = this
-        
         let items = []
         for(let i in this.tabs){
           items.push({
@@ -76,17 +81,34 @@
             that.activeIndex = obj.index
           }
         })
-
         //默认载入
-        //this.showSubPage(this.activeIndex)
+        // this.showSubPage(this.activeIndex)
         // 侧滑初始化
-        //this.menuInit()
-
+        // this.menuInit()
+      },
+      //关闭窗口
+      close() {
+        this.cw.close()
+      },
+      //打开setting
+      onClick() {
+        let page = "courseDetails.html",
+          ow = plus.webview.create(
+            page,
+            page,
+            {
+              popGesture: "close"
+            },
+          );
+        ow.onloading = () => {
+          ow.show("pop-in", 250);
+        };
       },
       //左上角菜单
       menu() {
         this.isShow = true
       },
+
       menuInit() {
         //设置遮罩点击事件
         this.cw.addEventListener("maskClick", () => {
@@ -136,17 +158,16 @@
           this.menuPage.hide()
         }, 200);
       },
-
       handleTabChange(index) {
+        //header展示效果
         this.activeIndex = index
         return this.group.switchTab(this.tabs[index].src)
         this.showSubPage(index)
         this.hideSubPage()
-        
       },
       showSubPage(index = 0) {
         let id = this.tabs[index].src,
-          want = plus.webview.getWebviewById(id)
+        want = plus.webview.getWebviewById(id)
         if (!want) {
           want = plus.webview.create(id, id, this.style)
           want.hide()
@@ -162,7 +183,6 @@
       hideSubPage(index) {
         plus.webview.hide(this.tabs[this.activeIndex].src)
       }
-
     },
     watch: {
       isShow(n) {

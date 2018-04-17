@@ -1,8 +1,7 @@
 <template>
   <div>
-    <!--<mu-appbar title="侧滑菜单">
-    </mu-appbar>--> 
-
+    <!-- <mu-appbar title="侧滑菜单">
+    </mu-appbar>  -->
     <mu-card>
       <!--<mu-card-header :title="u.name" :subTitle="u.think">
         <mu-avatar :src="u.avaimg" slot="avatar" />
@@ -10,17 +9,16 @@
       <mu-card-media :title="u.name" :subTitle="u.think">
         <img :src="u.bgimg" />
       </mu-card-media>
-
     </mu-card>
 
     <mu-menu class="demo-menu-divider">
       <!--<mu-menu-item title="注销" leftIcon="account_circle" @click='onClick'/>-->
       <mu-divider />
-      <mu-menu-item title="调戏女朋友" leftIcon="settings" @click='onSetting' />
+      <mu-menu-item title="人工智能" leftIcon="settings" @click='onSetting' />
       <mu-divider />
       <mu-menu-item title="换肤" leftIcon="remove_red_eye" @click='onThemeClick' />
       <mu-divider />
-      <mu-menu-item title="退出" leftIcon="power_settings_new" @click='onClose' />
+      <mu-menu-item title="退出应用" leftIcon="power_settings_new" @click='onClose' />
     </mu-menu>
 
 
@@ -65,7 +63,6 @@
             icon: 'inbox'
           }
         ],
-
         index: 0,
         themes,
         t: null,
