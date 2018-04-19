@@ -9,8 +9,6 @@ Vue.use(MuseUI)
 import VueResource from 'vue-resource'
 Vue.use(VueResource)
 
-
-
 //默认domReady事件
 import domReady from './ready.js'
 //默认plusReady事件

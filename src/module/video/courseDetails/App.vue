@@ -1,6 +1,5 @@
 <template>
   <div>
-    <link href="http://vjs.zencdn.net/6.6.3/video-js.css" rel="stylesheet">
     <mu-linear-progress v-show='loading' />
     <mu-appbar :title="title">
       <mu-icon-button icon='close' slot="left" @click='close()' />
@@ -55,22 +54,29 @@
       </div>
     </div>
     </template>
+    <template>
+      <div>
+        <mu-dialog :open="dialog" title="提示" @close="closeAlert">
+          当前网络为{{NetStateStr}}，是否继续播放？
+          <mu-flat-button slot="actions" primary @click="closeAlert(0)" label="取消"/>
+          <mu-flat-button slot="actions" primary @click="closeAlert(1)" label="确定"/>  
+        </mu-dialog>
+      </div>
+    </template>
   </div>
 </template>
-<script src="http://vjs.zencdn.net/6.6.3/video.js"></script>
 <script>
-  import {
-    domReady,
-    plusReady
-  } from 'common/js/ning/index.js'
-
+  import {domReady,plusReady} from 'common/js/ning/index.js';
   export default {
     data() {
       return {
         loading: true,
         url: '',
         title: '课程详情',
+        dialog: false,
         bw: null,
+        NetStateStr:"4G蜂窝网络",
+        ifJT:true,
         courseData:{
           title:"2018相关法精讲训练班：考点精讲课",
           titleDec:'相关法考试的重要考点讲解',
@@ -80,7 +86,7 @@
         },
         activeTab: 'tab1',
         playerOptions: {
-          height: '360',
+          height: '320',
           autoplay: false,
           muted: true,
           language: 'en',
@@ -116,19 +122,55 @@
       }, 5000)
     },
     created() {
-      plusReady(this.plusReady)
-      
+      plusReady(this.plusReady);
     },
     computed: {
       player() {
         return this.$refs.videoPlayer.player
-      }
+      },
+      timeOut: {  
+          set (val) {  
+              this.$store.state.timeout.compileTimeout = val;  
+          },  
+          get() {  
+              return this.$store.state.timeout.compileTimeout;  
+          }  
+      },  
     },
 
     methods: {
+        plusReady() {
+        this.cw = plus.webview.currentWebview()
+        this.url = this.cw.url
+        this.title = this.cw.title
+        setTimeout(function () { 
+          plus.webview.currentWebview().show('slide-in-right', 250);
+          plus.nativeUI.closeWaiting();
+        }, 300);
+        //视屏旋转
+        if(plus.os.name=="Android"){
+          var self = plus.webview.currentWebview();
+          self.setStyle({
+              videoFullscreen: 'landscape'
+          });
+        }else{
+          // IOS监听的事件
+          videoElem.addEventListener('webkitbeginfullscreen', function() {
+              plus.screen.lockOrientation('landscape'); //锁死屏幕方向为横屏
+          });
+          videoElem.addEventListener('webkitendfullscreen', function() {
+          //  plus.screen.unlockOrientation(); //解除屏幕方向的锁定，但是不一定是竖屏；
+              plus.screen.lockOrientation('portrait'); //锁死屏幕方向为竖屏
+          });
+        }
+        if(this.timeOut){  
+          clearTimeout(this.timeOut);  
+        };
+      },
       // listen event
       onPlayerPlay(player) {
-        // console.log('player play!', player)
+        // console.log('player play!', player);
+          this.getListIng();
       },
       onPlayerPause(player) {
         // console.log('player pause!', player)
@@ -172,33 +214,17 @@
       handleActive () {
         window.alert('tab active')
       },
-      plusReady() {
-        this.cw = plus.webview.currentWebview()
-        this.url = this.cw.url
-        this.title = this.cw.title
-        //this.createBowser()
-        //this.initBowser()
-        setTimeout(function () { 
-          plus.webview.currentWebview().show('slide-in-right', 250);
-          plus.nativeUI.closeWaiting();
-        }, 300);
-        //视屏旋转
-        if(plus.os.name=="Android"){
-          var self = plus.webview.currentWebview();
-          self.setStyle({
-              videoFullscreen: 'landscape'
-          });
-        }else{
-          // IOS监听的事件
-          videoElem.addEventListener('webkitbeginfullscreen', function() {
-              plus.screen.lockOrientation('landscape'); //锁死屏幕方向为横屏
-          });
-          videoElem.addEventListener('webkitendfullscreen', function() {
-          //  plus.screen.unlockOrientation(); //解除屏幕方向的锁定，但是不一定是竖屏；
-              plus.screen.lockOrientation('portrait'); //锁死屏幕方向为竖屏
-          });
+      openAlert () {
+        this.dialog = true
+      },
+      closeAlert (num) {
+        this.dialog = false;
+        if(num==1){
+          this.ifJT=false;
+          this.player.play();
         }
       },
+    
       close() {
         this.cw.close()
       },
@@ -221,14 +247,45 @@
         this.bw.addEventListener('loaded', (e) => {
           this.loading = false
         })
-      }
+      },
+      //监测网络状态
+      getListIng() {  
+        var types = [];
+        var num = plus.networkinfo.getCurrentType();
+        types[plus.networkinfo.CONNECTION_UNKNOW] = "未知";
+        types[plus.networkinfo.CONNECTION_NONE] = "未连接网络";
+        types[plus.networkinfo.CONNECTION_ETHERNET] = "有线网络";
+        types[plus.networkinfo.CONNECTION_WIFI] = "WiFi网络";
+        types[plus.networkinfo.CONNECTION_CELL2G] = "2G蜂窝网络";
+        types[plus.networkinfo.CONNECTION_CELL3G] = "3G蜂窝网络";
+        types[plus.networkinfo.CONNECTION_CELL4G] = "4G蜂窝网络";
+        this.NetStateStr = types[num];
+        console.log( this.NetStateStr);
+        if(this.NetStateStr=="3G蜂窝网络" || this.NetStateStr=="4G蜂窝网络"|| this.NetStateStr=="2G蜂窝网络"){
+          if(this.ifJT){
+            this.player.pause();
+            this.openAlert();
+          }
+          this.ifJT
+        }else{
+          if(this.NetStateStr=="WiFi网络"){
+            this.ifJT=true;
+          }
+          let _this = this;  
+          this.timeOut = setTimeout(() => {  
+              _this.getListIng();  
+          }, 2000);  
+        }
+      },  
+    },
+    watch: {
+
     }
   }
  
 </script>
 
 <style lang="css">
-
   /*进度条*/
   .mu-linear-progress{
     position: absolute !important;
