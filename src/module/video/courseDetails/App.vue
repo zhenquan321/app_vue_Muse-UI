@@ -1,57 +1,59 @@
 <template>
-  <div>
+  <div id="courseDetails">
     <mu-linear-progress v-show='loading' />
     <mu-appbar :title="title">
       <mu-icon-button icon='close' slot="left" @click='close()' />
     </mu-appbar>
     <template>
-      <mu-card>
-        <md-card-media>
-          <div class="item">
-            <div class="player">
-              <video-player  class="vjs-custom-skin"
-                            ref="videoPlayer"
-                            :options="playerOptions"
-                            :playsinline="true"
-                            @play="onPlayerPlay($event)"
-                            @pause="onPlayerPause($event)"
-                            @ended="onPlayerEnded($event)"
-                            @loadeddata="onPlayerLoadeddata($event)"
-                            @waiting="onPlayerWaiting($event)"
-                            @playing="onPlayerPlaying($event)"
-                            @timeupdate="onPlayerTimeupdate($event)"
-                            @canplay="onPlayerCanplay($event)"
-                            @canplaythrough="onPlayerCanplaythrough($event)"
-                            @ready="playerReadied"
-                            @statechanged="playerStateChanged($event)">
-              </video-player>
-            </div>
-          </div>
-        </md-card-media>
-        <mu-card-title :title="courseData.title" :subTitle="courseData.titleDec"/>
-        <mu-card-text>
-          {{courseData.courseDec}}
-        </mu-card-text>
-      </mu-card>
-    </template>
-    <template>
     <div>
-      <mu-tabs :value="activeTab" @change="handleTabChange">
-        <mu-tab value="tab1" title="课程简介"/>
-        <mu-tab value="tab2" title="讲师介绍"/>
-      </mu-tabs>
-      <div v-if="activeTab === 'tab1'">
-        <h2>课程简介</h2>
-        <p>
-          这是第一个 tab
-        </p>
+      <div class="p8">
+        <mu-card class="videoBoxD">
+           <mu-card-media style="position: absolute;">
+            <img src="/../../../static/img/loading.gif" />
+           </mu-card-media>
+          <div id="videoBox" ref="myVideoBox"></div>
+        </mu-card>
+        <mu-tabs :value="activeTab" @change="handleTabChange">
+          <mu-tab value="tab1" title="课程简介"/>
+          <mu-tab value="tab2" title="课程列表"/>
+        </mu-tabs>
       </div>
-      <div v-if="activeTab === 'tab2'">
-        <h2>讲师介绍</h2>
-        <p>
-          这是第二个 tab
-        </p>
+      <div class="p8 pt0" v-if="activeTab === 'tab1'">
+        <mu-card >
+          <div id="videoBox" ref="myVideoBox"></div>
+          <mu-card-title :title="courseData.title" :subTitle="courseData.titleDec"/>
+          <mu-card-text>
+            课时：{{70}}
+          </mu-card-text>
+        </mu-card>
       </div>
+      <div class="p8 pt0">
+        <div class="INcard">
+          <div v-if="activeTab === 'tab1'">
+            <div>
+            </div>
+              <h4>课程简介</h4>
+              <div>
+                <h5>针对人群</h5>
+                <p>
+                  这是第一个 tab
+                </p>
+              </div>
+          </div>
+          <div v-if="activeTab === 'tab2'" class="VideoList">
+            <mu-list class="pt0 pb0">
+              <div :index="index" v-for="(o,index) in courseDataList">
+                <mu-list-item :title="o.title" v-on:click="changVideo(index,o)">
+                  <mu-avatar v-if="o.videoStart" src="../../../static/img/kaishi.png" slot="rightAvatar"/>
+                  <mu-avatar v-if="!o.videoStart" src="../../../static/img/nokaishi.png" slot="rightAvatar"/>
+                </mu-list-item>
+                <mu-divider/>
+              </div>
+            </mu-list>
+          </div>
+        </div>
+      </div>
+     
     </div>
     </template>
     <template>
@@ -63,10 +65,18 @@
         </mu-dialog>
       </div>
     </template>
+    <template>
+      <div>
+        <mu-toast v-if="toast" :message="toastMasege" @close="hideToast"/> 
+      </div>
+    </template>
   </div>
 </template>
 <script>
   import {domReady,plusReady} from 'common/js/ning/index.js';
+  import Broadcast from 'common/js/ning/Broadcast.js';
+  import Cache from 'common/js/Base/Cache.js';
+  const broadcast = new Broadcast()
   export default {
     data() {
       return {
@@ -77,76 +87,72 @@
         bw: null,
         NetStateStr:"4G蜂窝网络",
         ifJT:true,
+        toast: false,
+        toastMasege:'',
+        courseDataList:[{
+          title:"2018相关法精讲训练班：考点精讲课",
+          titleDec:'相关法考试的重要考点讲解',
+          Teacher:'学院讲师',
+          courseDec:'拥有丰富经验的相关法考试讲师,该课程仅在系列出售',
+          img:'http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg',
+          videoUrl:"https://p.bokecc.com/player?vid=18F92307053FB84E9C33DC5901307461&siteid=6A19AAD6EABF585C&autoStart=false&width=100%&height=230&playerid=08143C56E1D83AE6&playertype=1",
+          videoStart:true,
+       },{
+          title:"2018相关法精讲训练班：考点精讲课",
+          titleDec:'相关法考试的重要考点讲解',
+          Teacher:'学院讲师',
+          courseDec:'拥有丰富经验的相关法考试讲师,该课程仅在系列出售',
+          img:'http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg',
+          videoUrl:"https://p.bokecc.com/player?vid=9E672D7BC713BA499C33DC5901307461&siteid=6A19AAD6EABF585C&autoStart=false&width=100%&height=230&playerid=08143C56E1D83AE6&playertype=1",
+          videoStart:false,
+       }],
         courseData:{
           title:"2018相关法精讲训练班：考点精讲课",
           titleDec:'相关法考试的重要考点讲解',
           Teacher:'学院讲师',
           courseDec:'拥有丰富经验的相关法考试讲师,该课程仅在系列出售',
-          img:'http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg'
-        },
+          img:'http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg',
+          videoUrl:"https://p.bokecc.com/player?vid=18F92307053FB84E9C33DC5901307461&siteid=6A19AAD6EABF585C&autoStart=false&width=100%&height=230&playerid=08143C56E1D83AE6&playertype=1",
+          videoStart:false,
+       },
         activeTab: 'tab1',
-        playerOptions: {
-          height: '320',
-          autoplay: false,
-          muted: true,
-          language: 'en',
-          playbackRates: [0.7, 1.0, 1.5, 2.0],
-          sources: [{
-            type: "video/mp4",
-            // mp4
-            src: "http://pic.ibaotu.com/00/60/75/01J888piCPNw.mp4",
-            // webm
-            // src: "https://cdn.theguardian.tv/webM/2015/07/20/150716YesMen_synd_768k_vp8.webm"
-          }],
-          poster: "https://surmon-china.github.io/vue-quill-editor/static/images/surmon-1.jpg",
-        }
       }
     },
     mounted() {
-      // console.log('this is current player instance object', this.player)
-      setTimeout(() => {
-        console.log('dynamic change options', this.player)
-        // change src
-        // this.playerOptions.sources[0].src = 'https://cdn.theguardian.tv/webM/2015/07/20/150716YesMen_synd_768k_vp8.webm';
-        // change item
-        // this.$set(this.playerOptions.sources, 0, {
-        //   type: "video/mp4",
-        //   src: 'https://cdn.theguardian.tv/webM/2015/07/20/150716YesMen_synd_768k_vp8.webm',
-        // })
-        // change array
-        // this.playerOptions.sources = [{
-        //   type: "video/mp4",
-        //   src: 'https://cdn.theguardian.tv/webM/2015/07/20/150716YesMen_synd_768k_vp8.webm',
-        // }]
-        this.player.muted(false)
-      }, 5000)
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      s.src = this.courseData.videoUrl;
+      document.getElementById("videoBox").appendChild(s);
     },
     created() {
       plusReady(this.plusReady);
     },
     computed: {
       player() {
-        return this.$refs.videoPlayer.player
+         return this.$refs.myVideoBox.firstChild.firstChild.childNodes[11];
       },
       timeOut: {  
-          set (val) {  
-              this.$store.state.timeout.compileTimeout = val;  
-          },  
-          get() {  
-              return this.$store.state.timeout.compileTimeout;  
-          }  
+        set (val) {  
+            this.$store.state.timeout.compileTimeout = val;  
+        },  
+        get() {  
+            return this.$store.state.timeout.compileTimeout;  
+        }  
       },  
     },
-
     methods: {
-        plusReady() {
+      ready() {
+        //读取缓存
+        this.getListIng();
+      },
+      plusReady() {
         this.cw = plus.webview.currentWebview()
         this.url = this.cw.url
         this.title = this.cw.title
         setTimeout(function () { 
           plus.webview.currentWebview().show('slide-in-right', 250);
           plus.nativeUI.closeWaiting();
-        }, 300);
+        }, 550);
         //视屏旋转
         if(plus.os.name=="Android"){
           var self = plus.webview.currentWebview();
@@ -163,53 +169,36 @@
               plus.screen.lockOrientation('portrait'); //锁死屏幕方向为竖屏
           });
         }
-        if(this.timeOut){  
-          clearTimeout(this.timeOut);  
+        this.getListIng();
+      },
+      createVideo() {
+        const s = document.createElement('script');
+        s.type = 'text/javascript';
+        s.src = this.courseData.videoUrl;
+        var div = document.getElementById("videoBox");  
+        while(div.hasChildNodes()) //当div下还存在子节点时 循环继续  
+        {  
+            div.removeChild(div.firstChild);  
+        }  
+        div.appendChild(s);
+      },
+      //切换视频源
+      changVideo(index,data){
+        console.log(index,data)
+        for(var i=0;i<this.courseDataList.length;i++){
+           this.courseDataList[i].videoStart=false;
         };
+        this.courseDataList[index].videoStart=true;
+        this.courseData=data;
+        this.createVideo();
       },
-      // listen event
-      onPlayerPlay(player) {
-        // console.log('player play!', player);
-          this.getListIng();
-      },
-      onPlayerPause(player) {
-        // console.log('player pause!', player)
-      },
-      onPlayerEnded(player) {
-        // console.log('player ended!', player)
-      },
-      onPlayerLoadeddata(player) {
-        // console.log('player Loadeddata!', player)
-      },
-      onPlayerWaiting(player) {
-        // console.log('player Waiting!', player)
-      },
-      onPlayerPlaying(player) {
-        // console.log('player Playing!', player)
-      },
-      onPlayerTimeupdate(player) {
-        // console.log('player Timeupdate!', player.currentTime())
-      },
-      onPlayerCanplay(player) {
-        // console.log('player Canplay!', player)
-      },
-      onPlayerCanplaythrough(player) {
-        // console.log('player Canplaythrough!', player)
-      },
-      // or listen state event
-      playerStateChanged(playerCurrentState) {
-        // console.log('player current update state', playerCurrentState)
-      },
-      // player is ready
-      playerReadied(player) {
-        // seek to 10s
-        console.log('example player 1 readied', player)
-        player.currentTime(10)
-        // console.log('example 01: the player is readied', player)
-      },
-
+      //网络切换
       handleTabChange (val) {
-        this.activeTab = val
+        this.showToast('网络已切换为WiFi网络')
+        this.activeTab = val;
+        broadcast.send('changemusic2', {
+          data: this.courseData
+        }, { ids: ['home.html'] })
       },
       handleActive () {
         window.alert('tab active')
@@ -220,17 +209,17 @@
       closeAlert (num) {
         this.dialog = false;
         if(num==1){
-          this.ifJT=false;
           this.player.play();
         }
+        this.ifJT=false;
+        plus.screen.unlockOrientation(); //解除屏幕方向的锁定
       },
-    
       close() {
         this.cw.close()
       },
       createBowser() {
         this.bw = plus.webview.create(this.url, 'bowser', {
-          top: '56px',
+          top: '45px',
           bottom: '0px',
           bounce: 'vertical'
         })
@@ -248,6 +237,16 @@
           this.loading = false
         })
       },
+      //提示
+      showToast (mag) {
+        this.toastMasege=mag
+        if (this.toastTimer) clearTimeout(this.toastTimer)
+        this.toastTimer = setTimeout(() => { this.toast = false }, 2000)
+      },
+      hideToast () {
+        this.toast = false
+        if (this.toastTimer) clearTimeout(this.toastTimer)
+      },
       //监测网络状态
       getListIng() {  
         var types = [];
@@ -260,29 +259,32 @@
         types[plus.networkinfo.CONNECTION_CELL3G] = "3G蜂窝网络";
         types[plus.networkinfo.CONNECTION_CELL4G] = "4G蜂窝网络";
         this.NetStateStr = types[num];
-        console.log( this.NetStateStr);
+        // console.log( this.NetStateStr);
         if(this.NetStateStr=="3G蜂窝网络" || this.NetStateStr=="4G蜂窝网络"|| this.NetStateStr=="2G蜂窝网络"){
           if(this.ifJT){
             this.player.pause();
+            //退出全屏
+            plus.screen.lockOrientation('portrait');
             this.openAlert();
           }
-          this.ifJT
         }else{
           if(this.NetStateStr=="WiFi网络"){
+            if(!this.ifJT){
+              this.showToast('网络已切换为WiFi网络')
+            }
             this.ifJT=true;
           }
-          let _this = this;  
-          this.timeOut = setTimeout(() => {  
-              _this.getListIng();  
-          }, 2000);  
         }
+        let _this = this;  
+        setTimeout(() => {  
+            _this.getListIng();  
+        }, 2000);  
       },  
     },
     watch: {
 
     }
   }
- 
 </script>
 
 <style lang="css">
@@ -294,5 +296,20 @@
     height: 2px !important;
     background-color: rgba(255,255,255,.35) !important;
   }
-
+  .videoBox{
+    min-height: 230px;
+  }
+  .VideoList{
+    margin: -16px;
+  }
+  .mu-item.show-right{
+    height: 68px;
+  }
+  .videoBoxD{
+    width: 100%;
+    height: 230px;
+    background-color: #555!important;
+    position: relative;
+  }
+  
 </style>

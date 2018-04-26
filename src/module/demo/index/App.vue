@@ -1,16 +1,18 @@
 <template>
-
- <div>
+  <div>
     <mu-appbar :title="tabs[activeIndex].title">
+      <!--<mu-icon-button icon='menu' slot="left" @click='menu' />-->
       <mu-icon-button icon='music' slot="right" />
     </mu-appbar>
-    <!-- <mu-paper>
+
+    <mu-paper>
       <mu-bottom-nav :value="activeIndex" shift @change="handleTabChange">
         <mu-bottom-nav-item v-for='t,i of tabs' :value='i' :icon="t.icon" :title='t.title' />
       </mu-bottom-nav>
-    </mu-paper> -->
+    </mu-paper>
   </div>
 </template>
+
 <script>
   import {
     domReady,
@@ -19,14 +21,14 @@
 
   import Broadcast from 'common/js/ning/Broadcast.js'
   import webviewGroup from 'common/js/ning/WebviewGroup.js'
- 
+
   export default {
     data() {
       return {
         activeIndex: 0,
         tabs: [
           {
-            title: '课程列表',
+            title: '主页',
             icon: 'home',
             src: 'home.html'
           },
@@ -59,9 +61,12 @@
     },
     methods: {
       plusReady() {
+        setTimeout(function () { 
+          plus.webview.currentWebview().show('slide-in-right', 250);
+          plus.nativeUI.closeWaiting();
+        }, 600);
         this.cw = plus.webview.currentWebview()
         let that = this
-        
         let items = []
         for(let i in this.tabs){
           items.push({
@@ -79,9 +84,9 @@
         })
 
         //默认载入
-        this.showSubPage(this.activeIndex)
-        //3侧滑初始化
-        this.menuInit()
+        //this.showSubPage(this.activeIndex)
+        // 侧滑初始化
+        //this.menuInit()
 
       },
       //左上角菜单
@@ -162,16 +167,8 @@
       },
       hideSubPage(index) {
         plus.webview.hide(this.tabs[this.activeIndex].src)
-      },
-      onGoSp() {
-        let url = 'robot.html',
-          w = plus.webview.create(url, url, {
-            popGesture: 'close'
-          })
-        w.addEventListener('titleUpdate', () => {
-          w.show('pop-in', 250)
-        })
       }
+
     },
     watch: {
       isShow(n) {

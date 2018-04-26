@@ -1,7 +1,8 @@
 <template>
   <div>
-    <!-- <mu-appbar title="侧滑菜单">
-    </mu-appbar>  -->
+    <!--<mu-appbar title="侧滑菜单">
+    </mu-appbar>--> 
+
     <mu-card>
       <!--<mu-card-header :title="u.name" :subTitle="u.think">
         <mu-avatar :src="u.avaimg" slot="avatar" />
@@ -9,18 +10,17 @@
       <mu-card-media :title="u.name" :subTitle="u.think">
         <img :src="u.bgimg" />
       </mu-card-media>
+
     </mu-card>
 
     <mu-menu class="demo-menu-divider">
       <!--<mu-menu-item title="注销" leftIcon="account_circle" @click='onClick'/>-->
       <mu-divider />
-      <mu-menu-item title="人工智能" leftIcon="settings" @click='onSetting' />
-      <mu-divider />
-       <mu-menu-item title="音乐" leftIcon="settings" @click='onSetting2' />
+      <mu-menu-item title="调戏女朋友" leftIcon="settings" @click='onSetting' />
       <mu-divider />
       <mu-menu-item title="换肤" leftIcon="remove_red_eye" @click='onThemeClick' />
       <mu-divider />
-      <mu-menu-item title="退出应用" leftIcon="power_settings_new" @click='onClose' />
+      <mu-menu-item title="退出" leftIcon="power_settings_new" @click='onClose' />
     </mu-menu>
 
 
@@ -65,6 +65,9 @@
             icon: 'inbox'
           }
         ],
+
+
+
         index: 0,
         themes,
         t: null,
@@ -99,7 +102,6 @@
         this.index++
       },
       onHide() {
-        //发送_隐藏_消息
         new Broadcast().send('_hideMenu', {}, { ids: ['index.html'] })
       },
       onClose() {
@@ -113,17 +115,7 @@
         w.addEventListener('titleUpdate', () => {
           w.show('pop-in', 250)
         })
-      },
-      onSetting2() {
-        let url = 'music.html',
-          w = plus.webview.create(url, url, {
-            popGesture: 'close'
-          })
-        w.addEventListener('titleUpdate', () => {
-          w.show('pop-in', 250)
-        })
-      },
-
+      }
     },
     watch: {
       index(n, o) {

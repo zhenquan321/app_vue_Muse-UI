@@ -26,12 +26,20 @@
   const dj = new DJYE(),
     cache = new Cache('ingmusic'),
     broadcast = new Broadcast()
-
   export default {
     data() {
       return {
         index: 0,
-        list: []
+        list: [
+          {
+            title:"2018名师讲解训练班：相关法",
+            n:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+          },
+          {
+            title:"2018名师讲解训练班：相关法",
+            n:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+          },
+        ]
       }
     },
     computed: {
@@ -46,10 +54,8 @@
     },
     created() {
       //监听播放歌曲变化
-      broadcast.listen('changemusic', (data) => {
-        this.index = this.list.findIndex((o) => {
-          o.s === data.id
-        })
+      broadcast.listen('changemusic33', (data) => {
+        alert(JSON.stringify(data))
       })
       plusReady(this.plusReady)
     },
@@ -64,7 +70,6 @@
       },
       onTap(o, i) {
         this.index = i
-
         let url = 'music_play.html',
           w = plus.webview.getWebviewById(url)
         if (!w) {
@@ -78,11 +83,10 @@
         } else {
           this.send()
         }
-
       },
       send() {
         broadcast.send('changemusic', {
-          id: this.indexMusic.s
+          id: "sssssawawda"
         }, { ids: ['music_play.html'] })
       }
     },

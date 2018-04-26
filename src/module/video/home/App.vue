@@ -7,14 +7,13 @@
     </mu-list>
     <mu-divider/>
   </div>-->
-  <div class="demo-infinite-container">
-    <mu-list>
-       <template v-for='o,i of list'>
+  <div class="demo-infinite-container bgf0f1f4">
+    <mu-list id="KClist" class="pt0">
+        <div v-for='o,i of list'>
           <mu-list-item :title="o.title" :describeText="o.author_name"  @click='onClick(o)'>
             <mu-avatar :src="o.thumbnail_pic_s" slot="leftAvatar" />
           </mu-list-item>
-          <mu-divider inset/>
-       </template>
+        </div>
     </mu-list>
     <mu-infinite-scroll :scroller="scroller" :loading="loading" @load="up" :loadingText='""' />
   </div>
@@ -24,7 +23,6 @@
       <template v-for="o,i of list">
         <mu-list-item :title="o.title" :describeText="o.excerpt" @click='onClick(o)'>
         <mu-avatar :src="o.thumb" slot="leftAvatar" />
-      
         </mu-list-item>
       </template>
     </mu-list>
@@ -32,9 +30,10 @@
 </template>
 <script>
 import { domReady, plusReady } from "common/js/ning/index.js";
-
 import SF from "common/js/App/SFArticle.js";
-
+import Broadcast from 'common/js/ning/Broadcast.js';
+import Cache from 'common/js/Base/Cache.js'
+const broadcast = new Broadcast()
 export default {
   data() {
     return {
@@ -128,6 +127,10 @@ export default {
     };
   },
   created() {
+    broadcast.listen('changemusic2', (data) => {
+        this.index = data.id
+        alert(JSON.stringify(data));
+     })
     this.ready();
     plusReady(this.plusReady);
   },
@@ -209,7 +212,7 @@ export default {
   }
 };
 </script>
-<style lang="css">
+<style lang="less">
 .mu-item-text {
   max-height: 18px !important;
 }

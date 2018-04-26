@@ -40,13 +40,18 @@
     },
     created() {
       // 获取将要播放的一首歌的信息
+      broadcast.listen('changemusic', (data) => {
+        alert(JSON.stringify(data))
+      })
+      broadcast.send('changemusic33', {
+          id: "6666666"
+      }, { ids: ['music.html'] })
       this.indexMusic = cache.data
       plusReady(this.plusReady)
     },
     methods: {
       plusReady() {
         this.cw = plus.webview.currentWebview()
-        alert(JSON.stringify(this.indexMusic))
       },
       close() {
         this.cw.hide('slide-out-bottom', 250)

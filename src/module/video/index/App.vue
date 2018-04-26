@@ -1,10 +1,14 @@
 <template>
   <div>
-    <mu-appbar :title="tabs[activeIndex].title"  slot="center">
+    <!-- <mu-appbar :title="tabs[activeIndex].title"  slot="center">
       <mu-icon-button v-if="activeIndex==0" icon="arrow_back_ios" slot="left" @click='close' />
       <mu-icon-button v-if="activeIndex==0" icon='menu' slot="right" @click='handleTabChange(1)' />
       <mu-icon-button v-if="activeIndex==1" icon="arrow_back_ios" slot="left" @click='handleTabChange(0)' />
       <mu-icon-button v-if="activeIndex==1" icon='' slot="right"  />
+    </mu-appbar> -->
+    <mu-appbar :title="tabs[activeIndex].title"  slot="center">
+      <mu-icon-button  icon="arrow_back_ios" slot="left" @click='close' />
+      <mu-icon-button  icon='' slot="right"  />
     </mu-appbar>
     <!-- <mu-paper>
       <mu-bottom-nav :value="activeIndex" shift @change="handleTabChange">
@@ -43,7 +47,7 @@
           }
         ],
         style: {
-          top: '56px',
+          top: '45px',
           bottom: '0px',
           popGesture: 'none'
         },
@@ -54,6 +58,7 @@
     },
     created() {
       plusReady(this.plusReady)
+      //获取_隐藏_广播消息
       new Broadcast().listen('_hideMenu', (e) => {
         this.isShow = false
       })

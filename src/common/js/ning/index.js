@@ -13,6 +13,8 @@ Vue.use(VueResource)
 import domReady from './ready.js'
 //默认plusReady事件
 import plusReady from './plusReady.js'
+import style from '../../css/style.less'
+import fontAwesome from 'font-awesome-webpack'
 
 module.exports = {
     domReady,
