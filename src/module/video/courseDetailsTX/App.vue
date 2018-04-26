@@ -9,9 +9,9 @@
       <div class="p8">
         <mu-card class="videoBoxD">
            <mu-card-media style="position: absolute;">
-            <img src="/../../../static/img/loading.gif" />
+             <img src="/../../../static/img/loading.gif" />
            </mu-card-media>
-          <div id="videoBox" ref="myVideoBox"></div>
+          <div id="myVideoBox" ref="myVideoBox"></div>
         </mu-card>
         <mu-tabs :value="activeTab" @change="handleTabChange">
           <mu-tab value="tab1" title="课程简介"/>
@@ -20,7 +20,6 @@
       </div>
       <div class="p8 pt0" v-if="activeTab === 'tab1'">
         <mu-card >
-          <!-- <div id="videoBox" ref="myVideoBox"></div> -->
           <mu-card-title :title="courseData.title" :subTitle="courseData.titleDec"/>
           <mu-card-text>
             课时：{{70}}
@@ -76,7 +75,10 @@
   import {domReady,plusReady} from 'common/js/ning/index.js';
   import Broadcast from 'common/js/ning/Broadcast.js';
   import Cache from 'common/js/Base/Cache.js';
+  import TcPlayer from 'Tcplayer';
+
   const broadcast = new Broadcast()
+
   export default {
     data() {
       return {
@@ -118,11 +120,14 @@
         activeTab: 'tab1',
       }
     },
+    props:{
+      movMsg:{
+        type:Object
+      }
+    },
     mounted() {
-      const s = document.createElement('script');
-      s.type = 'text/javascript';
-      s.src = this.courseData.videoUrl;
-      document.getElementById("videoBox").appendChild(s);
+        this.setPlayer();
+        console.log("ssss",this.$refs.myVideoBox);
     },
     created() {
       plusReady(this.plusReady);
@@ -144,11 +149,14 @@
       ready() {
         //读取缓存
         this.getListIng();
+        this.setPlayer();
+        console.log("ssss",this.$refs.myVideoBox);
       },
       plusReady() {
         this.cw = plus.webview.currentWebview()
         this.url = this.cw.url
         this.title = this.cw.title
+        this.setPlayer();
         setTimeout(function () { 
           plus.webview.currentWebview().show('slide-in-right', 250);
           plus.nativeUI.closeWaiting();
@@ -170,6 +178,13 @@
           });
         }
         this.getListIng();
+      },
+      //设置播放器
+      setPlayer(){
+         const player = new TcPlayer("myVideoBox", {
+            fileID: '4564972818956091133', // 请传入需要播放的视频filID 必须
+            appID: '1253668508' // 请传入点播账号的appID 必须
+        })
       },
       createVideo() {
         const s = document.createElement('script');
@@ -282,7 +297,12 @@
       },  
     },
     watch: {
-
+      movMsg:{
+        handler(newValue,oldValue){
+          this.$refs.myVideoBox.innerHTML="";
+          this.setPlayer();
+        }
+      }
     }
   }
 </script>

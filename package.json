@@ -13,6 +13,7 @@
     "font-awesome": "^4.7.0",
     "leancloud-storage": "^2.1.1",
     "muse-ui": "^2.0.0-rc.2",
+    "tcplayer": "^2.2.1",
     "video.js": "^6.7.3",
     "vue": "^2.0.1",
     "vue-awesome": "^3.0.0",
