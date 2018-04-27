@@ -53,7 +53,6 @@
           </div>
         </div>
       </div>
-     
     </div>
     </template>
     <template>
@@ -80,7 +79,7 @@
   export default {
     data() {
       return {
-        loading: true,
+        loading: false,
         url: '',
         title: '课程详情',
         dialog: false,
@@ -89,6 +88,7 @@
         ifJT:true,
         toast: false,
         toastMasege:'',
+        videoData:{},
         courseDataList:[{
           title:"2018相关法精讲训练班：考点精讲课",
           titleDec:'相关法考试的重要考点讲解',
@@ -147,8 +147,15 @@
       },
       plusReady() {
         this.cw = plus.webview.currentWebview()
-        this.url = this.cw.url
-        this.title = this.cw.title
+        this.courseDataList=this.cw.videoData.vlist;
+        this.courseData=this.cw.videoData.courseData;
+        for(var i=0;i< this.courseDataList.length;i++){
+          this.courseDataList[i].videoUrl = 'https://p.bokecc.com/player?vid='+ this.courseDataList[i].qcloud_id+'DC5901307461&siteid=D7C8C99121633982&autoStart=false&width=100%&height=230&playerid=08143C56E1D83AE6&playertype=1';
+          this.courseDataList[i].title = this.courseDataList[i].node_title
+          this.courseDataList[i].videoStart = false;
+        }
+        this.videoData = this.courseDataList[0];
+        this.videoData.videoStart=true;
         setTimeout(function () { 
           plus.webview.currentWebview().show('slide-in-right', 250);
           plus.nativeUI.closeWaiting();
@@ -178,7 +185,7 @@
         var div = document.getElementById("videoBox");  
         while(div.hasChildNodes()) //当div下还存在子节点时 循环继续  
         {  
-            div.removeChild(div.firstChild);  
+          div.removeChild(div.firstChild);  
         }  
         div.appendChild(s);
       },
@@ -195,9 +202,9 @@
       //网络切换
       handleTabChange (val) {
         this.activeTab = val;
-        broadcast.send('changemusic2', {
-          data: this.courseData
-        }, { ids: ['home.html'] })
+        // broadcast.send('changemusic2', {
+        //   data: this.courseData
+        // }, { ids: ['home.html'] })
       },
       handleActive () {
         window.alert('tab active')
@@ -226,9 +233,6 @@
         this.bw.show()
       },
       initBowser() {
-        this.bw.addEventListener('titleUpdate', (e) => {
-          this.title = e.title
-        })
         this.bw.addEventListener('loading', (e) => {
           this.loading = true
         })

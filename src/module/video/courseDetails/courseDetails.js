@@ -10,7 +10,7 @@ new Vue({
   components: { App }
 })
 
-Vue.use(VueVideoPlayer, /* {
-  options: global default options,
-  events: global videojs events
-} */)
+// Vue.use(VueVideoPlayer, /* {
+//   options: global default options,
+//   events: global videojs events
+// } */)

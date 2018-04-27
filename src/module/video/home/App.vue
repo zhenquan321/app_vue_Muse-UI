@@ -25,8 +25,8 @@
     </div>
     <div  v-if="activeTab === 'tab2'">
       <mu-list id="KClist" class="pt0">
-        <div v-for='(o,i) in list'>
-          <mu-list-item :title="o.title" :describeText="o.ser_speaker" @click="open('right')">
+        <div v-for='(o,i) in list2'>
+          <mu-list-item :title="o.ser_title" :describeText="o.ser_speaker" @click="open('right',o)">
             <mu-avatar :src="o.coverpath" slot="leftAvatar" />
           </mu-list-item>
         </div>
@@ -35,14 +35,24 @@
     <!-- 下拉刷新 -->
     <mu-infinite-scroll :scroller="scroller" :loading="loading" @load="up" :loadingText='""' />
     <mu-popup position="right" popupClass="demo-popup-right" :open="rightPopup" @close="close('right')" >
+      <div class="leftGun">
         <mu-list id="KClist2" class="pt0">
           <div v-for='(o,i) in list3'>
-            <mu-list-item :title="o.title" :describeText="o.tname" @click="open('right')">
+            <mu-list-item :title="o.title" :describeText="o.tname"  @click='onClick(o)'>
               <mu-avatar :src="o.coverpath" slot="leftAvatar" />
             </mu-list-item>
           </div>
         </mu-list>
+      </div>
     </mu-popup>
+    <template>
+      <div>
+        <mu-dialog :open="dialog" title="提示" @close="closeAlert">
+          非常抱歉~，当前课程为直播课，开发小哥正在紧急开发APP直播系统中，如着急，请转至电脑端查看！
+          <mu-flat-button slot="actions" primary @click="closeAlert(1)" label="确定"/>  
+        </mu-dialog>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -51,17 +61,18 @@ import { domReady, plusReady } from "common/js/ning/index.js";
 import SF from "common/js/App/SFArticle.js";
 import Broadcast from 'common/js/ning/Broadcast.js';
 import Cache from 'common/js/Base/Cache.js'
+import axios from "axios"
 const broadcast = new Broadcast()
 export default {
   data() {
     return {
       list: [
-        {
-          title:"2018名师讲解训练班：相关法",
-          tname:'李老虎是',
-          coverpath:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
-          id:794,
-        },
+        // {
+        //   title:"2018名师讲解训练班：相关法",
+        //   tname:'李老虎是',
+        //   coverpath:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+        //   id:794,
+        // },
       ],
       list2: [
         {
@@ -84,7 +95,8 @@ export default {
       scroller: null,
       activeTab:'tab1',
       rightPopup: false,
-      num:2,
+      num:3,
+      dialog:false,
     };
   },
   created() {
@@ -100,37 +112,83 @@ export default {
   },
   methods: {
     ready() {
-      //读取缓存
+    //读取缓存
       this.sf = new SF();
       this.list.push(...this.sf.getLocalData());
       console.log("缓存数据哦：" + JSON.stringify(this.sf.getLocalData()));
       //获取网络数据 下拉
       this.index = 1;
+      this.getNetData(1,this.num)
     },
-       //网络切换
+    //网络切换
     handleTabChange (val) {
         this.activeTab = val;
+        console.log(val)
+        if(val=="tab1"){
+          this.getNetData(1,3)
+        }else if(val=="tab2"){
+          this.getNetData(1,2)
+        }
     },
     plusReady() {
       this.cw = plus.webview.currentWebview();
     },
     onClick(item) {
-      let page = "courseDetails.html",
-        ow = plus.webview.create(
-          page,
-          page,
-          {
-            popGesture: "close"
-          },
-          {
-            url: item.url,
-            title: item.title
+      console.log(item);
+      if(item.type==1){
+        this.openAlert()
+        return
+      }else{
+        const parmas={
+          uid:'165319',
+          pk:item.id,
+        }
+        let url = "http://sapi.test.mysipo.com/api_v1/Course/details";
+        this.loading = true;
+        axios.get(url,{
+          params: parmas
+        })
+        .then(response => {
+          console.log(response.data)
+           this.loading = false;
+          if(response.data.code==200||response.data.code==0){
+            if(response.data.data.vData.video_type==0){
+              //腾讯云
+
+            }else if(response.data.data.vData.video_type==1){
+              //CC视屏
+              let page = "courseDetails.html",
+              ow = plus.webview.create(
+                page,
+                page,
+                {
+                  popGesture: "close"
+                },
+                {
+                  videoData: response.data.data,
+                }
+              );
+              ow.onloading = () => {
+                plus.nativeUI.showWaiting();
+                // ow.show("pop-in", 250);
+              };
+            }
+          }else if(response.code==1006){
+            //用户未登录相关操作
           }
-        );
-      ow.onloading = () => {
-        plus.nativeUI.showWaiting();
-        // ow.show("pop-in", 250);
-      };
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      }
+   
+    },
+    //alert
+    openAlert () {
+      this.dialog = true
+    },
+    closeAlert () {
+      this.dialog = false;
     },
     getNetData(isDwon,num) {
       const parmas={
@@ -140,26 +198,47 @@ export default {
       }
       let url = "http://sapi.test.mysipo.com/api_v1/MyCenter/courseList";
       this.loading = true;
-      this.$http.get(url,{params:params})
-        .then(
-          res => {
-            let data = res.body;
-            data = data.result.data;
-            this.loading = false;
-            if (isDwon) {
-              //去重 新数据在前
-              this.list = Array.from(new Set(data, this.list));
-              //保存缓存数据 只保存最新的data
-              this.sf.setLocalData(data);
-            } else {
-              this.list.push(...data);
-            }
-          },
-          e => {
-            this.loading = false;
-            console.log(JSON.stringify(e));
+      axios.get(url,{
+        params: parmas
+      })
+      .then(response => {
+        this.loading = false;
+        console.log(response.data)
+        if(response.data.code==200||response.data.code==0){
+          if(num==2){
+            this.list2=response.data.data.datainfo;
+            console.log(this.list)
+          }else if(num==3){
+            this.list=response.data.data.datainfo;
+            console.log(this.list)
           }
-        );
+        }else if(response.code==1006){
+          //用户未登录相关操作
+        }
+      })
+      .catch(error => {
+        console.log(error);
+      });
+      // this.$http.get(url,{params:params})
+      //   .then(
+      //     res => {
+      //       let data = res.body;
+      //       data = data.result.data;
+      //       this.loading = false;
+      //       if (isDwon) {
+      //         //去重 新数据在前
+      //         this.list = Array.from(new Set(data, this.list));
+      //         //保存缓存数据 只保存最新的data
+      //         this.sf.setLocalData(data);
+      //       } else {
+      //         this.list.push(...data);
+      //       }
+      //     },
+      //     e => {
+      //       this.loading = false;
+      //       console.log(JSON.stringify(e));
+      //     }
+      //   );
     },
     //下拉
     down() {
@@ -168,7 +247,11 @@ export default {
     up() {
       this.index++;
     },
-    open (position) {
+    open (position,data) {
+      if(data){
+        console.log(data);
+        this.list3=data.courseData;
+      }
       this[position + 'Popup'] = true
     },
     close (position) {
@@ -176,9 +259,9 @@ export default {
     }
   },
   watch: {
-    index(n, o) {
-      this.getNetData(n === 1 || n < o,this.num);
-    }
+    // index(n, o) {
+    //   this.getNetData(n === 1 || n < o,this.num);
+    // }
   }
 };
 </script>
@@ -198,5 +281,16 @@ export default {
   height: 100%;
   background-color:#f0f1f4!important;
   border-left: 2px solid #1fdec2; 
+}
+.leftGun{
+  height: 100%;
+  overflow: auto;
+}
+.Secard{
+  padding: 10px;
+  padding-bottom: 0px;
+}
+.mu-ripple-wrapper{
+  color:#1fdec2;
 }
 </style>
