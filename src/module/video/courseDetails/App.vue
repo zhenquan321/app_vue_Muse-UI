@@ -194,7 +194,6 @@
       },
       //网络切换
       handleTabChange (val) {
-        this.showToast('网络已切换为WiFi网络')
         this.activeTab = val;
         broadcast.send('changemusic2', {
           data: this.courseData

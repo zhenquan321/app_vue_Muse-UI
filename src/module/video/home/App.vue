@@ -1,4 +1,4 @@
-<template>
+<template  >
   <!--<div>
     <mu-list>
       <mu-list-item v-for='o,i of list' :title="o.title" :describeText="o.excerpt" @click='onClick(o)'>
@@ -7,27 +7,45 @@
     </mu-list>
     <mu-divider/>
   </div>-->
-  <div class="demo-infinite-container bgf0f1f4">
-    <mu-list id="KClist" class="pt0">
-        <div v-for='o,i of list'>
-          <mu-list-item :title="o.title" :describeText="o.author_name"  @click='onClick(o)'>
-            <mu-avatar :src="o.thumbnail_pic_s" slot="leftAvatar" />
+  <div class="demo-infinite-container bgf0f1f4" id="courseList">
+    <div class="Secard">
+      <mu-tabs :value="activeTab" @change="handleTabChange">
+        <mu-tab value="tab1" title="课程"/>
+        <mu-tab value="tab2" title="系列课"/>
+      </mu-tabs>
+    </div>
+   <div class="" v-if="activeTab === 'tab1'">
+      <mu-list id="KClist" class="pt0">
+          <div v-for='(o,i) in list'>
+            <mu-list-item :title="o.title" :describeText="o.tname"  @click='onClick(o)'>
+              <mu-avatar :src="o.coverpath" slot="leftAvatar" />
+            </mu-list-item>
+          </div>
+      </mu-list>
+    </div>
+    <div  v-if="activeTab === 'tab2'">
+      <mu-list id="KClist" class="pt0">
+        <div v-for='(o,i) in list'>
+          <mu-list-item :title="o.title" :describeText="o.ser_speaker" @click="open('right')">
+            <mu-avatar :src="o.coverpath" slot="leftAvatar" />
           </mu-list-item>
         </div>
-    </mu-list>
+      </mu-list>
+    </div>
+    <!-- 下拉刷新 -->
     <mu-infinite-scroll :scroller="scroller" :loading="loading" @load="up" :loadingText='""' />
+    <mu-popup position="right" popupClass="demo-popup-right" :open="rightPopup" @close="close('right')" >
+        <mu-list id="KClist2" class="pt0">
+          <div v-for='(o,i) in list3'>
+            <mu-list-item :title="o.title" :describeText="o.tname" @click="open('right')">
+              <mu-avatar :src="o.coverpath" slot="leftAvatar" />
+            </mu-list-item>
+          </div>
+        </mu-list>
+    </mu-popup>
   </div>
-  <!--<div class="demo-refresh-container">
-    <mu-refresh-control :refreshing="refreshing" :trigger="trigger" @refresh="down"/>
-    <mu-list>
-      <template v-for="o,i of list">
-        <mu-list-item :title="o.title" :describeText="o.excerpt" @click='onClick(o)'>
-        <mu-avatar :src="o.thumb" slot="leftAvatar" />
-        </mu-list-item>
-      </template>
-    </mu-list>
-  </div>-->
 </template>
+
 <script>
 import { domReady, plusReady } from "common/js/ning/index.js";
 import SF from "common/js/App/SFArticle.js";
@@ -40,90 +58,33 @@ export default {
       list: [
         {
           title:"2018名师讲解训练班：相关法",
-          author_name:'李老虎是',
-          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
-          url:"http://s.mysipo.com/course/view/id/672"
+          tname:'李老虎是',
+          coverpath:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+          id:794,
         },
+      ],
+      list2: [
+        {
+          ser_title:"2018名师讲解训练班：相关法",
+          ser_id:'666',
+          coverpath:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+          ser_speaker:'学院讲师',
+        },
+      ],
+      list3: [
         {
           title:"2018名师讲解训练班：相关法",
-          author_name:'李老虎是',
-          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
-          url:"http://s.mysipo.com/course/view/id/672"
-        },
-          {
-          title:"2018名师讲解训练班：相关法",
-          author_name:'李老虎是',
-          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
-        },
-        {
-          title:"2018名师讲解训练班：相关法",
-          author_name:'李老虎是',
-          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
-        },
-         {
-          title:"2018名师讲解训练班：相关法",
-          author_name:'李老虎是',
-          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
-        },
-         {
-          title:"2018名师讲解训练班：相关法",
-          author_name:'李老虎是',
-          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
-        },
-         {
-          title:"2018名师讲解训练班：相关法",
-          author_name:'李老虎是',
-          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
-        },
-         {
-          title:"2018名师讲解训练班：相关法",
-          author_name:'李老虎是',
-          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
-        },
-         {
-          title:"2018名师讲解训练班：相关法",
-          author_name:'李老虎是',
-          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
-        },
-         {
-          title:"2018名师讲解训练班：相关法",
-          author_name:'李老虎是',
-          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
-        },
-         {
-          title:"2018名师讲解训练班：相关法",
-          author_name:'李老虎是',
-          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
-        },
-         {
-          title:"2018名师讲解训练班：相关法",
-          author_name:'李老虎是',
-          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
-        },
-         {
-          title:"2018名师讲解训练班：相关法",
-          author_name:'李老虎是',
-          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
-        },
-         {
-          title:"2018名师讲解训练班：相关法",
-          author_name:'李老虎是',
-          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
-        },
-         {
-          title:"2018名师讲解训练班：相关法",
-          author_name:'李老虎是',
-          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
-        },
-         {
-          title:"2018名师讲解训练班：相关法",
-          author_name:'李老虎是',
-          thumbnail_pic_s:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+          tname:'李老虎是',
+          coverpath:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+          id:794,
         },
       ],
       index: -1,
       loading: false,
-      scroller: null
+      scroller: null,
+      activeTab:'tab1',
+      rightPopup: false,
+      num:2,
     };
   },
   created() {
@@ -146,6 +107,10 @@ export default {
       //获取网络数据 下拉
       this.index = 1;
     },
+       //网络切换
+    handleTabChange (val) {
+        this.activeTab = val;
+    },
     plusReady() {
       this.cw = plus.webview.currentWebview();
     },
@@ -167,16 +132,15 @@ export default {
         // ow.show("pop-in", 250);
       };
     },
-    getNetData(isDwon) {
-      let url = "暂时";
+    getNetData(isDwon,num) {
+      const parmas={
+        uid:'165319',
+        type:num,
+        is_cache:false,
+      }
+      let url = "http://sapi.test.mysipo.com/api_v1/MyCenter/courseList";
       this.loading = true;
-      this.$http
-        .get(url, {
-          // parmas,
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-          }
-        })
+      this.$http.get(url,{params:params})
         .then(
           res => {
             let data = res.body;
@@ -203,11 +167,17 @@ export default {
     },
     up() {
       this.index++;
+    },
+    open (position) {
+      this[position + 'Popup'] = true
+    },
+    close (position) {
+      this[position + 'Popup'] = false
     }
   },
   watch: {
     index(n, o) {
-      this.getNetData(n === 1 || n < o);
+      this.getNetData(n === 1 || n < o,this.num);
     }
   }
 };
@@ -222,5 +192,11 @@ export default {
   height: 100%;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
+}
+.mu-popup{
+  width: 80%;
+  height: 100%;
+  background-color:#f0f1f4!important;
+  border-left: 2px solid #1fdec2; 
 }
 </style>

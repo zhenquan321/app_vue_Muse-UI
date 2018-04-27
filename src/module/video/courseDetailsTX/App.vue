@@ -78,7 +78,6 @@
   import TcPlayer from 'Tcplayer';
 
   const broadcast = new Broadcast()
-
   export default {
     data() {
       return {
