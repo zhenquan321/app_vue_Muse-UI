@@ -9,7 +9,7 @@
       <div class="p8">
         <mu-card class="videoBoxD">
            <mu-card-media style="position: absolute;">
-            <img src="/../../../static/img/loading.gif" />
+            <img src="../static/img/loading.gif" />
            </mu-card-media>
           <div id="videoBox" ref="myVideoBox"></div>
         </mu-card>
@@ -47,8 +47,8 @@
             <mu-list class="pt0 pb0">
               <div :index="index" v-for="(o,index) in courseDataList">
                 <mu-list-item :title="o.title" v-on:click="changVideo(index,o)">
-                  <mu-avatar v-if="o.videoStart" src="../../../static/img/kaishi.png" slot="rightAvatar"/>
-                  <mu-avatar v-if="!o.videoStart" src="../../../static/img/nokaishi.png" slot="rightAvatar"/>
+                  <mu-avatar v-if="o.videoStart" src="../static/img/kaishi.png" slot="rightAvatar"/>
+                  <mu-avatar v-if="!o.videoStart" src="../static/img/nokaishi.png" slot="rightAvatar"/>
                 </mu-list-item>
                 <mu-divider/>
               </div>

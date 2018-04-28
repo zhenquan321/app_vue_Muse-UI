@@ -32,3 +32,6 @@ npm run build
 ```
 
 集成vue-video-player
+
+15.打包图片背景地址不对
+16. axios  http地址  config配置   

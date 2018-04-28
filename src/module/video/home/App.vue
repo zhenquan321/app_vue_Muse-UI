@@ -25,7 +25,7 @@
       </mu-list>
        <div class="h600p" v-show="list.length<=0">
         <mu-card-media class="h100">
-          <img  style="width:3"  src="/../../../static/img/zwkc.png" />
+          <img  style="width:3"  src="../static/img/zwkc.png" />
         </mu-card-media>
       </div>
     </div>
@@ -39,7 +39,7 @@
       </mu-list>
       <div class="h600p" v-show="list2.length<=0">
         <mu-card-media class="h100">
-          <img  style="width:3"  src="/../../../static/img/zwkc.png" />
+          <img  style="width:3"  src="../static/img/zwkc.png" />
         </mu-card-media>
       </div>
     </div>
