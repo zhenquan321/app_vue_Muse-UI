@@ -14,7 +14,8 @@
         <mu-tab value="tab2" title="系列课"/>
       </mu-tabs>
     </div>
-   <div class="" v-if="activeTab === 'tab1'">
+
+   <div class="" v-show="activeTab === 'tab1'">
       <mu-list id="KClist" class="pt0">
           <div v-for='(o,i) in list'>
             <mu-list-item :title="o.title" :describeText="o.tname"  @click='onClick(o)'>
@@ -22,8 +23,13 @@
             </mu-list-item>
           </div>
       </mu-list>
+       <div class="h600p" v-show="list.length<=0">
+        <mu-card-media class="h100">
+          <img  style="width:3"  src="/../../../static/img/zwkc.png" />
+        </mu-card-media>
+      </div>
     </div>
-    <div  v-if="activeTab === 'tab2'">
+    <div  v-show="activeTab === 'tab2'">
       <mu-list id="KClist" class="pt0">
         <div v-for='(o,i) in list2'>
           <mu-list-item :title="o.ser_title" :describeText="o.ser_speaker" @click="open('right',o)">
@@ -31,7 +37,13 @@
           </mu-list-item>
         </div>
       </mu-list>
+      <div class="h600p" v-show="list2.length<=0">
+        <mu-card-media class="h100">
+          <img  style="width:3"  src="/../../../static/img/zwkc.png" />
+        </mu-card-media>
+      </div>
     </div>
+  
     <!-- 下拉刷新 -->
     <mu-infinite-scroll :scroller="scroller" :loading="loading" @load="up" :loadingText='""' />
     <mu-popup position="right" popupClass="demo-popup-right" :open="rightPopup" @close="close('right')" >
@@ -48,7 +60,7 @@
     <template>
       <div>
         <mu-dialog :open="dialog" title="提示" @close="closeAlert">
-          非常抱歉~，当前课程为直播课，开发小哥正在紧急开发APP直播系统中，如着急，请转至电脑端查看！
+          {{AlertMag}}
           <mu-flat-button slot="actions" primary @click="closeAlert(1)" label="确定"/>  
         </mu-dialog>
       </div>
@@ -75,35 +87,42 @@ export default {
         // },
       ],
       list2: [
-        {
-          ser_title:"2018名师讲解训练班：相关法",
-          ser_id:'666',
-          coverpath:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
-          ser_speaker:'学院讲师',
-        },
+        // {
+        //   ser_title:"2018名师讲解训练班：相关法",
+        //   ser_id:'666',
+        //   coverpath:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+        //   ser_speaker:'学院讲师',
+        // },
       ],
       list3: [
-        {
-          title:"2018名师讲解训练班：相关法",
-          tname:'李老虎是',
-          coverpath:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
-          id:794,
-        },
+        // {
+        //   title:"2018名师讲解训练班：相关法",
+        //   tname:'李老虎是',
+        //   coverpath:"http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg",
+        //   id:794,
+        // },
       ],
+      AlertMag:'非常抱歉~，当前课程为直播课，开发小哥正在紧急开发APP直播系统中，如着急，请转至电脑端查看！',
+      userid:"",
       index: -1,
       loading: false,
       scroller: null,
       activeTab:'tab1',
+      noCase:true,
       rightPopup: false,
       num:3,
       dialog:false,
     };
   },
+  // created() {
+  //   // broadcast.listen('changemusic2', (data) => {
+  //   //     this.index = data.id
+  //   //     alert(JSON.stringify(data));
+  //   // })
+  //   this.ready();
+  //   plusReady(this.plusReady);
+  // },
   created() {
-    broadcast.listen('changemusic2', (data) => {
-        this.index = data.id
-        alert(JSON.stringify(data));
-     })
     this.ready();
     plusReady(this.plusReady);
   },
@@ -111,6 +130,13 @@ export default {
     this.scroller = this.$el;
   },
   methods: {
+    plusReady() {
+      this.cw = plus.webview.currentWebview();
+      // alert(this.userid);
+      this.userid = plus.storage.getItem('userid') ? plus.storage.getItem('userid') : '';//'165319'
+      this.getNetData(1,this.num);
+      
+    },
     ready() {
     //读取缓存
       this.sf = new SF();
@@ -118,7 +144,6 @@ export default {
       console.log("缓存数据哦：" + JSON.stringify(this.sf.getLocalData()));
       //获取网络数据 下拉
       this.index = 1;
-      this.getNetData(1,this.num)
     },
     //网络切换
     handleTabChange (val) {
@@ -130,17 +155,14 @@ export default {
           this.getNetData(1,2)
         }
     },
-    plusReady() {
-      this.cw = plus.webview.currentWebview();
-    },
     onClick(item) {
       console.log(item);
       if(item.type==1){
-        this.openAlert()
+        this.openAlert('抱歉,亲~！当前课程为直播课，开发小哥正在紧急开发APP直播系统中，请前往网站观看~')
         return
       }else{
         const parmas={
-          uid:'165319',
+          uid:this.userid,
           pk:item.id,
         }
         let url = "http://sapi.test.mysipo.com/api_v1/Course/details";
@@ -149,16 +171,32 @@ export default {
           params: parmas
         })
         .then(response => {
-          console.log(response.data)
+           console.log(JSON.stringify(response.data));
+          // response.data=this.domeData;
            this.loading = false;
           if(response.data.code==200||response.data.code==0){
             if(response.data.data.vData.video_type==0){
-              //腾讯云
-
+              this.openAlert("抱歉，亲~！当前课程暂不支持APP播放，请前往网站观看~")
+              //腾讯云----在不跳转
+              // let page = "../../view/video/videoTX.html",
+              // ow = plus.webview.create(
+              //   page,
+              //   page,
+              //   {
+              //     popGesture: "close"
+              //   },
+              //   {
+              //     videoData: response.data.data,
+              //   }
+              // );
+              // ow.onloading = () => {
+              //   plus.nativeUI.showWaiting();
+              //   // ow.show("pop-in", 250);
+              // };
             }else if(response.data.data.vData.video_type==1){
               //CC视屏
-              let page = "courseDetails.html",
-              ow = plus.webview.create(
+              let page = "courseDetails.html";
+              let ow = plus.webview.create(
                 page,
                 page,
                 {
@@ -184,18 +222,20 @@ export default {
    
     },
     //alert
-    openAlert () {
-      this.dialog = true
+    openAlert (AlertMag) {
+      this.AlertMag=AlertMag;
+      this.dialog = true;
     },
     closeAlert () {
       this.dialog = false;
     },
     getNetData(isDwon,num) {
       const parmas={
-        uid:'165319',
+        uid:this.userid,
         type:num,
         is_cache:false,
       }
+      console.log("列表参数值："+JSON.stringify(parmas));
       let url = "http://sapi.test.mysipo.com/api_v1/MyCenter/courseList";
       this.loading = true;
       axios.get(url,{
@@ -203,8 +243,9 @@ export default {
       })
       .then(response => {
         this.loading = false;
-        console.log(response.data)
+        console.log(JSON.stringify(response.data));
         if(response.data.code==200||response.data.code==0){
+          this.noCase=false;
           if(num==2){
             this.list2=response.data.data.datainfo;
             console.log(this.list)
@@ -214,6 +255,8 @@ export default {
           }
         }else if(response.code==1006){
           //用户未登录相关操作
+        }else if(response.code==1105){
+          this.noCase=true;
         }
       })
       .catch(error => {
@@ -240,6 +283,7 @@ export default {
       //     }
       //   );
     },
+
     //下拉
     down() {
       this.index = 1;
@@ -292,5 +336,18 @@ export default {
 }
 .mu-ripple-wrapper{
   color:#1fdec2;
+}
+.mu-card-media>img {
+    width: auto!important;
+    min-width: auto!important;
+    height: 30%;
+    margin-top: 45%;
+    display: inline-block!important;
+}
+.h600p .mu-card-media {
+  text-align: center;
+}
+.mu-circle-ripple, .mu-ripple-wrapper{
+  height: 48px!important;
 }
 </style>

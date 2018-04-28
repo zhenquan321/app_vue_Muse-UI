@@ -52,13 +52,11 @@ module.exports = {
       query: {
         limit: 10000,
         name: utils.assetsPath('img/[name].[hash:7].[ext]')
+      },
+      options:{
+        publicPath:'./../..'
       }
     }, 
-    // font-awesome
-    {
-        test: /\.(png|gif|jpg|jpeg)$/,
-        loader: "url?name=img/[hash:8].[ext]"
-    },
     {
         test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
         loader: 'url?name=font/[name].[ext]&limit=10000&minetype=application/font-woff'

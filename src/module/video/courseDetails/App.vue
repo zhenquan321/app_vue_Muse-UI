@@ -21,9 +21,9 @@
       <div class="p8 pt0" v-if="activeTab === 'tab1'">
         <mu-card >
           <!-- <div id="videoBox" ref="myVideoBox"></div> -->
-          <mu-card-title :title="courseData.title" :subTitle="courseData.titleDec"/>
+          <mu-card-title :title="curseDatajs.title" :subTitle="curseDatajs.synopsis"/>
           <mu-card-text>
-            课时：{{70}}
+            课时：{{curseDatajs.class_hour}}
           </mu-card-text>
         </mu-card>
       </div>
@@ -33,11 +33,14 @@
             <div>
             </div>
               <h4>课程简介</h4>
-              <div>
-                <h5>针对人群</h5>
+              <div class="pt15">
+                <div v-html="curseDatajs.introduce">
+
+                </div>
+                <!-- <h5>针对人群</h5>
                 <p>
                   这是第一个 tab
-                </p>
+                </p> -->
               </div>
           </div>
           <div v-if="activeTab === 'tab2'" class="VideoList">
@@ -103,7 +106,7 @@
           Teacher:'学院讲师',
           courseDec:'拥有丰富经验的相关法考试讲师,该课程仅在系列出售',
           img:'http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg',
-          videoUrl:"https://p.bokecc.com/player?vid=9E672D7BC713BA499C33DC5901307461&siteid=6A19AAD6EABF585C&autoStart=false&width=100%&height=230&playerid=08143C56E1D83AE6&playertype=1",
+          videoUrl:"https://p.bokecc.com/player?vid=9E672D7BC713BA499C33DC5901307461&siteid=6A19AAD6EABF585C&autoStart=false&width=100%&height=250&playerid=08143C56E1D83AE6&playertype=1",
           videoStart:false,
        }],
         courseData:{
@@ -112,9 +115,55 @@
           Teacher:'学院讲师',
           courseDec:'拥有丰富经验的相关法考试讲师,该课程仅在系列出售',
           img:'http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg',
-          videoUrl:"https://p.bokecc.com/player?vid=18F92307053FB84E9C33DC5901307461&siteid=6A19AAD6EABF585C&autoStart=false&width=100%&height=230&playerid=08143C56E1D83AE6&playertype=1",
+          videoUrl:"https://p.bokecc.com/player?vid=18F92307053FB84E9C33DC5901307461&siteid=6A19AAD6EABF585C&autoStart=false&width=100%&height=250&playerid=08143C56E1D83AE6&playertype=1",
           videoStart:false,
        },
+       curseDatajs:{
+            // "id": 129,
+            // "title": "新颖性",
+            // "synopsis": "1212",
+            // "introduce": "454",
+            // "classify": 1,
+            // "level": 1,
+            // "class_hour": 1,
+            // "gensee_key": "",
+            // "gensee_code": "",
+            // "tutor_key": "",
+            // "stu_key": "",
+            // "tch_key": "",
+            // "tutor_id": 112653,
+            // "tch_id": 132784,
+            // "tch_synopsis": "5454",
+            // "start_time": "2016-08-23 00:00:00",
+            // "end_time": "2016-08-23 00:00:01",
+            // "price": 0,
+            // "pre_price": 0,
+            // "sign_up_num": 0,
+            // "cover": 0,
+            // "vip": 0,
+            // "hot": 0,
+            // "type": 2,
+            // "status": 0,
+            // "recommend": 0,
+            // "homework": 0,
+            // "along": 1,
+            // "old_live": 0,
+            // "is_delete": 0,
+            // "old_video": 57,
+            // "tname": "学院讲师",
+            // "is_show": 1,
+            // "tch_introduce": "",
+            // "learn_url": "",
+            // "right_touch": 0,
+            // "left_touch": 0,
+            // "create_time": 1488787447,
+            // "cc_type": 1,
+            // "agreement_id": 0,
+            // "formattime": "",
+            // "coverpath": "",
+            // "teachername": "学院讲师",
+            // "agreement_path": ""
+        },
         activeTab: 'tab1',
       }
     },
@@ -125,6 +174,7 @@
       document.getElementById("videoBox").appendChild(s);
     },
     created() {
+      this.ready();
       plusReady(this.plusReady);
     },
     computed: {
@@ -143,19 +193,19 @@
     methods: {
       ready() {
         //读取缓存
-        this.getListIng();
       },
       plusReady() {
-        this.cw = plus.webview.currentWebview()
+        this.cw = plus.webview.currentWebview();
         this.courseDataList=this.cw.videoData.vlist;
-        this.courseData=this.cw.videoData.courseData;
+        this.curseDatajs=this.cw.videoData.courseData;
+        console.log(JSON.stringify(this.curseDatajs))
         for(var i=0;i< this.courseDataList.length;i++){
-          this.courseDataList[i].videoUrl = 'https://p.bokecc.com/player?vid='+ this.courseDataList[i].qcloud_id+'DC5901307461&siteid=D7C8C99121633982&autoStart=false&width=100%&height=230&playerid=08143C56E1D83AE6&playertype=1';
+          this.courseDataList[i].videoUrl = 'https://p.bokecc.com/player?vid='+ this.courseDataList[i].qcloud_id+'DC5901307461&siteid=D7C8C99121633982&autoStart=false&width=100%&height=250&playerid=08143C56E1D83AE6&playertype=1';
           this.courseDataList[i].title = this.courseDataList[i].node_title
           this.courseDataList[i].videoStart = false;
         }
-        this.videoData = this.courseDataList[0];
-        this.videoData.videoStart=true;
+        this.courseData = this.courseDataList[0];
+        this.courseData.videoStart=true;
         setTimeout(function () { 
           plus.webview.currentWebview().show('slide-in-right', 250);
           plus.nativeUI.closeWaiting();
@@ -300,7 +350,7 @@
     background-color: rgba(255,255,255,.35) !important;
   }
   .videoBox{
-    min-height: 230px;
+    min-height: 250px;
   }
   .VideoList{
     margin: -16px;
@@ -310,7 +360,7 @@
   }
   .videoBoxD{
     width: 100%;
-    height: 230px;
+    height: 250px;
     background-color: #555!important;
     position: relative;
   }

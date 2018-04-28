@@ -43,8 +43,8 @@
             <mu-list class="pt0 pb0">
               <div :index="index" v-for="(o,index) in courseDataList">
                 <mu-list-item :title="o.title" v-on:click="changVideo(index,o)">
-                  <mu-avatar v-if="o.videoStart" src="../../../static/img/kaishi.png" slot="rightAvatar"/>
-                  <mu-avatar v-if="!o.videoStart" src="../../../static/img/nokaishi.png" slot="rightAvatar"/>
+                  <mu-avatar v-if="o.videoStart" src="./../../../static/img/kaishi.png" slot="rightAvatar"/>
+                  <mu-avatar v-if="!o.videoStart" src="./../../../static/img/nokaishi.png" slot="rightAvatar"/>
                 </mu-list-item>
                 <mu-divider/>
               </div>
@@ -52,7 +52,6 @@
           </div>
         </div>
       </div>
-     
     </div>
     </template>
     <template>
