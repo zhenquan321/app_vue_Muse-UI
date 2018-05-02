@@ -156,7 +156,6 @@ export default {
         }
     },
     onClick(item) {
-      console.log(item);
       if(item.type==1){
         this.openAlert('抱歉,亲~！当前课程为直播课，开发小哥正在紧急开发APP直播系统中，请前往网站观看~')
         return
@@ -165,61 +164,52 @@ export default {
           uid:this.userid,
           pk:item.id,
         }
-        let url = "http://sapi.test.mysipo.com/api_v1/Course/details";
-        this.loading = true;
-        axios.get(url,{
-          params: parmas
-        })
-        .then(response => {
-           console.log(JSON.stringify(response.data));
-          // response.data=this.domeData;
-           this.loading = false;
-          if(response.data.code==200||response.data.code==0){
-            if(response.data.data.vData.video_type==0){
-              this.openAlert("抱歉，亲~！当前课程暂不支持APP播放，请前往网站观看~")
-              //腾讯云----在不跳转
-              // let page = "../../view/video/videoTX.html",
-              // ow = plus.webview.create(
-              //   page,
-              //   page,
-              //   {
-              //     popGesture: "close"
-              //   },
-              //   {
-              //     videoData: response.data.data,
-              //   }
-              // );
-              // ow.onloading = () => {
-              //   plus.nativeUI.showWaiting();
-              //   // ow.show("pop-in", 250);
-              // };
-            }else if(response.data.data.vData.video_type==1){
-              //CC视屏
-              let page = "courseDetails.html";
-              let ow = plus.webview.create(
-                page,
-                page,
-                {
-                  popGesture: "close"
-                },
-                {
-                  videoData: response.data.data,
-                }
-              );
-              ow.onloading = () => {
-                plus.nativeUI.showWaiting();
-                // ow.show("pop-in", 250);
-              };
-            }
-          }else if(response.code==1006){
-            //用户未登录相关操作
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        });
       }
-   
+      this.loading = true;
+      this.$api.get('Course/details', parmas, response => {
+        console.log(JSON.stringify(response.data));
+        this.loading = false;
+        if(response.data.data.vData.video_type==0){
+          this.openAlert("抱歉，亲~！当前课程暂不支持APP播放，请前往网站观看~")
+          //腾讯云----在不跳转
+          // let page = "../../view/video/videoTX.html",
+          // ow = plus.webview.create(
+          //   page,
+          //   page,
+          //   {
+          //     popGesture: "close"
+          //   },
+          //   {
+          //     videoData: response.data.data,
+          //   }
+          // );
+          // ow.onloading = () => {
+          //   plus.nativeUI.showWaiting();
+          //   // ow.show("pop-in", 250);
+          // };
+        }else if(response.data.data.vData.video_type==1){
+          //CC视屏
+          let page = "courseDetails.html";
+          let ow = plus.webview.create(
+            page,
+            page,
+            {
+              popGesture: "close"
+            },
+            {
+              videoData: response.data.data,
+            }
+          );
+          ow.onloading = () => {
+            plus.nativeUI.showWaiting();
+            // ow.show("pop-in", 250);
+          };
+         };
+        },
+        failure => {
+          this.loading = false;
+          console.log(JSON.stringify(failure))
+        })
     },
     //alert
     openAlert (AlertMag) {
@@ -230,18 +220,13 @@ export default {
       this.dialog = false;
     },
     getNetData(isDwon,num) {
+      this.loading = true;
       const parmas={
         uid:this.userid,
         type:num,
         is_cache:false,
       }
-      console.log("列表参数值："+JSON.stringify(parmas));
-      let url = "http://sapi.test.mysipo.com/api_v1/MyCenter/courseList";
-      this.loading = true;
-      axios.get(url,{
-        params: parmas
-      })
-      .then(response => {
+      this.$api.get('MyCenter/courseList', parmas, response => {
         this.loading = false;
         console.log(JSON.stringify(response.data));
         if(response.data.code==200||response.data.code==0){
@@ -253,15 +238,38 @@ export default {
             this.list=response.data.data.datainfo;
             console.log(this.list)
           }
-        }else if(response.code==1006){
-          //用户未登录相关操作
-        }else if(response.code==1105){
-          this.noCase=true;
         }
+      },
+      failure => {
+        this.loading = false;
+        this.noCase=true;
+        console.log(JSON.stringify(failure))
       })
-      .catch(error => {
-        console.log(error);
-      });
+      // console.log("列表参数值："+JSON.stringify(parmas));
+      // let url = "http://sapi.test.mysipo.com/api_v1/";
+      // this.$api.get("MyCenter/courseList",{
+      //   params: parmas
+      // }).then(response => {
+      //   this.loading = false;
+      //   console.log(JSON.stringify(response.data));
+      //   if(response.data.code==200||response.data.code==0){
+      //     this.noCase=false;
+      //     if(num==2){
+      //       this.list2=response.data.data.datainfo;
+      //       console.log(this.list)
+      //     }else if(num==3){
+      //       this.list=response.data.data.datainfo;
+      //       console.log(this.list)
+      //     }
+      //   }else if(response.code==1006){
+      //     //用户未登录相关操作
+      //   }else if(response.code==1105){
+      //     this.noCase=true;
+      //   }
+      // })
+      // .catch(error => {
+      //   console.log(error);
+      // });
       // this.$http.get(url,{params:params})
       //   .then(
       //     res => {

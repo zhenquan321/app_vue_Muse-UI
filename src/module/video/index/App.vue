@@ -61,7 +61,7 @@
       //获取_隐藏_广播消息
       new Broadcast().listen('_hideMenu', (e) => {
         this.isShow = false
-      })
+      });
     },
     methods: {
       plusReady() {
