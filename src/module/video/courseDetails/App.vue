@@ -198,13 +198,12 @@
         this.cw = plus.webview.currentWebview();
         this.courseDataList=this.cw.videoData.vlist;
         this.curseDatajs=this.cw.videoData.courseData;
-        console.log(JSON.stringify(this.curseDatajs))
         for(var i=0;i< this.courseDataList.length;i++){
           this.courseDataList[i].videoUrl = 'https://p.bokecc.com/player?vid='+ this.courseDataList[i].qcloud_id+'DC5901307461&siteid=D7C8C99121633982&autoStart=false&width=100%&height=250&playerid=08143C56E1D83AE6&playertype=1';
           this.courseDataList[i].title = this.courseDataList[i].node_title
           this.courseDataList[i].videoStart = false;
         }
-        this.changVideo(this.courseDataList[0],0)
+        this.changVideo(this.courseDataList[0],0,true);
         // this.courseDataList[0].videoStart=true;
         // this.courseData = this.courseDataList[0];
         setTimeout(function () { 
@@ -218,14 +217,23 @@
               videoFullscreen: 'landscape'
           });
         }else{
-          // IOS监听的事件
-          videoElem.addEventListener('webkitbeginfullscreen', function() {
-              plus.screen.lockOrientation('landscape'); //锁死屏幕方向为横屏
-          });
-          videoElem.addEventListener('webkitendfullscreen', function() {
-          //  plus.screen.unlockOrientation(); //解除屏幕方向的锁定，但是不一定是竖屏；
-              plus.screen.lockOrientation('portrait'); //锁死屏幕方向为竖屏
-          });
+          var fullScreenOfIos = function(videoElem) {
+              // 监听的事件与Android平台有很大区别
+              videoElem.addEventListener('webkitbeginfullscreen', function() {
+                  plus.screen.lockOrientation('landscape'); //锁死屏幕方向为横屏
+              });
+              videoElem.addEventListener('webkitendfullscreen', function() {
+                  plus.screen.lockOrientation('portrait-primary'); //锁死屏幕方向为竖屏
+              });
+          };
+          // // IOS监听的事件
+          // videoElem.addEventListener('webkitbeginfullscreen', function() {
+          //     plus.screen.lockOrientation('landscape'); //锁死屏幕方向为横屏
+          // });
+          // videoElem.addEventListener('webkitendfullscreen', function() {
+          // //  plus.screen.unlockOrientation(); //解除屏幕方向的锁定，但是不一定是竖屏；
+          //     plus.screen.lockOrientation('portrait'); //锁死屏幕方向为竖屏
+          // });
         }
         this.getListIng();
       },
@@ -241,8 +249,7 @@
         div.appendChild(s);
       },
       //切换视频源
-      changVideo(data,index){
-        console.log(index,data)
+      changVideo(data,index,type){
         this.activeTab="tab1";
         for(var i=0;i<this.courseDataList.length;i++){
           if(i==index){
@@ -251,7 +258,9 @@
             this.courseDataList[i].videoStart=false;
           }
         };
-        this.activeTab="tab2";
+        if(!type){
+          this.activeTab="tab2";
+        }
         this.courseData=this.courseDataList[index];
         this.createVideo();
       },
@@ -266,14 +275,16 @@
         window.alert('tab active')
       },
       openAlert () {
-        this.dialog = true
+        this.dialog = true;
+    
+        plus.screen.lockOrientation('portrait-primary');
       },
       closeAlert (num) {
         this.dialog = false;
         if(num==1){
           this.player.play();
         }
-        this.ifJT=false;
+        this.ifJT=true;
         plus.screen.unlockOrientation(); //解除屏幕方向的锁定
       },
       close() {
@@ -318,13 +329,19 @@
         types[plus.networkinfo.CONNECTION_CELL3G] = "3G蜂窝网络";
         types[plus.networkinfo.CONNECTION_CELL4G] = "4G蜂窝网络";
         this.NetStateStr = types[num];
-        // console.log( this.NetStateStr);
+        console.log( this.num);
+        console.log( this.NetStateStr);
         if(this.NetStateStr=="3G蜂窝网络" || this.NetStateStr=="4G蜂窝网络"|| this.NetStateStr=="2G蜂窝网络"){
-          if(this.ifJT){
+         console.log(this.player.paused)
+         if(this.ifJT){
+           if(!this.player.paused){
             this.player.pause();
+            this.player.webkitExitFullScreen();;
             //退出全屏
+            plus.screen.lockOrientation('portrait-primary'); 
             plus.screen.lockOrientation('portrait');
             this.openAlert();
+           }
           }
         }else{
           if(this.NetStateStr=="WiFi网络"){

@@ -40,11 +40,11 @@
           //   icon: 'touch_app',
           //   src: 'music.html'
           // },
-          {
-            title: '课程设置',
-            icon: 'account_box',
-            src: 'menu.html'
-          }
+          // {
+          //   title: '课程设置',
+          //   icon: 'account_box',
+          //   src: 'menu.html'
+          // }
         ],
         style: {
           top: '45px',

@@ -125,7 +125,6 @@
     },
     mounted() {
         this.setPlayer();
-        console.log("ssss",this.$refs.myVideoBox);
     },
     created() {
       plusReady(this.plusReady);
@@ -148,7 +147,6 @@
         //读取缓存
         this.getListIng();
         this.setPlayer();
-        console.log("ssss",this.$refs.myVideoBox);
       },
       plusReady() {
         this.cw = plus.webview.currentWebview()
@@ -197,7 +195,6 @@
       },
       //切换视频源
       changVideo(index,data){
-        console.log(index,data)
         for(var i=0;i<this.courseDataList.length;i++){
            this.courseDataList[i].videoStart=false;
         };

@@ -109,7 +109,7 @@ export default {
           },
           e => {
             this.loading = false;
-            console.log(JSON.stringify(e));
+            //console.log(JSON.stringify(e));
           }
         );
     },

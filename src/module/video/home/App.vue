@@ -134,7 +134,7 @@ export default {
       this.cw = plus.webview.currentWebview();
       // alert(this.userid);
       this.userid = plus.storage.getItem('userid') ? plus.storage.getItem('userid') : '';//'165319'
-      // this.userid ='165319';
+      this.userid ='165319';
       this.getNetData(1,this.num);
     },
     ready() {
