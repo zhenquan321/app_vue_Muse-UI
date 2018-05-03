@@ -23,7 +23,7 @@
             </mu-list-item>
           </div>
       </mu-list>
-       <div class="h600p" v-show="list.length<=0">
+       <div class="h600p" v-show="noCase">
         <mu-card-media class="h100">
           <img  style="width:3"  src="../static/img/zwkc.png" />
         </mu-card-media>
@@ -37,7 +37,7 @@
           </mu-list-item>
         </div>
       </mu-list>
-      <div class="h600p" v-show="list2.length<=0">
+      <div class="h600p" v-show="noCase">
         <mu-card-media class="h100">
           <img  style="width:3"  src="../static/img/zwkc.png" />
         </mu-card-media>
@@ -45,7 +45,7 @@
     </div>
   
     <!-- 下拉刷新 -->
-    <mu-infinite-scroll :scroller="scroller" :loading="loading" @load="up" :loadingText='""' />
+    <!-- <mu-infinite-scroll :scroller="scroller" :loading="loading" @load="up" :loadingText='""' /> -->
     <mu-popup position="right" popupClass="demo-popup-right" :open="rightPopup" @close="close('right')" >
       <div class="leftGun">
         <mu-list id="KClist2" class="pt0">
@@ -108,7 +108,7 @@ export default {
       loading: false,
       scroller: null,
       activeTab:'tab1',
-      noCase:true,
+      noCase:false,
       rightPopup: false,
       num:3,
       dialog:false,
@@ -134,14 +134,14 @@ export default {
       this.cw = plus.webview.currentWebview();
       // alert(this.userid);
       this.userid = plus.storage.getItem('userid') ? plus.storage.getItem('userid') : '';//'165319'
+      this.userid ='165319';
       this.getNetData(1,this.num);
-      
     },
     ready() {
     //读取缓存
-      this.sf = new SF();
-      this.list.push(...this.sf.getLocalData());
-      console.log("缓存数据哦：" + JSON.stringify(this.sf.getLocalData()));
+      // this.sf = new SF();
+      // this.list.push(...this.sf.getLocalData());
+      // console.log("缓存数据哦：" + JSON.stringify(this.sf.getLocalData()));
       //获取网络数据 下拉
       this.index = 1;
     },
@@ -160,7 +160,7 @@ export default {
         this.openAlert('抱歉,亲~！当前课程为直播课，开发小哥正在紧急开发APP直播系统中，请前往网站观看~')
         return
       }else{
-        const parmas={
+        var parmas={
           uid:this.userid,
           pk:item.id,
         }
@@ -169,7 +169,7 @@ export default {
       this.$api.get('Course/details', parmas, response => {
         console.log(JSON.stringify(response.data));
         this.loading = false;
-        if(response.data.data.vData.video_type==0){
+        if(response.data.vData.video_type==0){
           this.openAlert("抱歉，亲~！当前课程暂不支持APP播放，请前往网站观看~")
           //腾讯云----在不跳转
           // let page = "../../view/video/videoTX.html",
@@ -187,7 +187,7 @@ export default {
           //   plus.nativeUI.showWaiting();
           //   // ow.show("pop-in", 250);
           // };
-        }else if(response.data.data.vData.video_type==1){
+        }else if(response.data.vData.video_type==1){
           //CC视屏
           let page = "courseDetails.html";
           let ow = plus.webview.create(
@@ -197,7 +197,7 @@ export default {
               popGesture: "close"
             },
             {
-              videoData: response.data.data,
+              videoData: response.data,
             }
           );
           ow.onloading = () => {
@@ -229,15 +229,13 @@ export default {
       this.$api.get('MyCenter/courseList', parmas, response => {
         this.loading = false;
         console.log(JSON.stringify(response.data));
-        if(response.data.code==200||response.data.code==0){
-          this.noCase=false;
-          if(num==2){
-            this.list2=response.data.data.datainfo;
-            console.log(this.list)
-          }else if(num==3){
-            this.list=response.data.data.datainfo;
-            console.log(this.list)
-          }
+        this.noCase=false;
+        if(num==2){
+          this.list2=response.data.datainfo;
+          console.log(this.list)
+        }else if(num==3){
+          this.list=response.data.datainfo;
+          console.log(this.list)
         }
       },
       failure => {

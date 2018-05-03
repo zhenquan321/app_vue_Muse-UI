@@ -46,9 +46,9 @@
           <div v-if="activeTab === 'tab2'" class="VideoList">
             <mu-list class="pt0 pb0">
               <div :index="index" v-for="(o,index) in courseDataList">
-                <mu-list-item :title="o.title" v-on:click="changVideo(index,o)">
-                  <mu-avatar v-if="o.videoStart" src="../static/img/kaishi.png" slot="rightAvatar"/>
-                  <mu-avatar v-if="!o.videoStart" src="../static/img/nokaishi.png" slot="rightAvatar"/>
+                <mu-list-item :title="o.title" v-on:click="changVideo(o,index)">
+                  <mu-avatar v-show="o.videoStart" src="../static/img/kaishi.png" slot="rightAvatar"/>
+                  <mu-avatar v-show="!o.videoStart" src="../static/img/nokaishi.png" slot="rightAvatar"/>
                 </mu-list-item>
                 <mu-divider/>
               </div>
@@ -204,8 +204,9 @@
           this.courseDataList[i].title = this.courseDataList[i].node_title
           this.courseDataList[i].videoStart = false;
         }
-        this.courseData = this.courseDataList[0];
-        this.courseData.videoStart=true;
+        this.changVideo(this.courseDataList[0],0)
+        // this.courseDataList[0].videoStart=true;
+        // this.courseData = this.courseDataList[0];
         setTimeout(function () { 
           plus.webview.currentWebview().show('slide-in-right', 250);
           plus.nativeUI.closeWaiting();
@@ -240,13 +241,18 @@
         div.appendChild(s);
       },
       //切换视频源
-      changVideo(index,data){
+      changVideo(data,index){
         console.log(index,data)
+        this.activeTab="tab1";
         for(var i=0;i<this.courseDataList.length;i++){
-           this.courseDataList[i].videoStart=false;
+          if(i==index){
+            this.courseDataList[i].videoStart=true;
+          }else{
+            this.courseDataList[i].videoStart=false;
+          }
         };
-        this.courseDataList[index].videoStart=true;
-        this.courseData=data;
+        this.activeTab="tab2";
+        this.courseData=this.courseDataList[index];
         this.createVideo();
       },
       //网络切换
