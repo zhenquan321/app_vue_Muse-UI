@@ -132,7 +132,6 @@ export default {
   methods: {
     plusReady() {
       this.cw = plus.webview.currentWebview();
-      // alert(this.userid);
       this.userid = plus.storage.getItem('userid') ? plus.storage.getItem('userid') : '';//'165319'
       this.userid ='165319';
       this.getNetData(1,this.num);
@@ -148,7 +147,7 @@ export default {
     //网络切换
     handleTabChange (val) {
         this.activeTab = val;
-        console.log(val)
+        // console.log(val)
         if(val=="tab1"){
           this.getNetData(1,3)
         }else if(val=="tab2"){
@@ -167,7 +166,7 @@ export default {
       }
       this.loading = true;
       this.$api.get('Course/details', parmas, response => {
-        console.log(JSON.stringify(response.data));
+        // console.log(JSON.stringify(response.data));
         this.loading = false;
         if(response.data.vData.video_type==0){
           this.openAlert("抱歉，亲~！当前课程暂不支持APP播放，请前往网站观看~")
@@ -208,7 +207,7 @@ export default {
         },
         failure => {
           this.loading = false;
-          console.log(JSON.stringify(failure))
+          // console.log(JSON.stringify(failure))
         })
     },
     //alert
@@ -228,20 +227,20 @@ export default {
       }
       this.$api.get('MyCenter/courseList', parmas, response => {
         this.loading = false;
-        console.log(JSON.stringify(response.data));
+        // console.log(JSON.stringify(response.data));
         this.noCase=false;
         if(num==2){
           this.list2=response.data.datainfo;
-          console.log(this.list)
+          // console.log(this.list)
         }else if(num==3){
           this.list=response.data.datainfo;
-          console.log(this.list)
+          // console.log(this.list)
         }
       },
       failure => {
         this.loading = false;
         this.noCase=true;
-        console.log(JSON.stringify(failure))
+        // console.log(JSON.stringify(failure))
       })
       // console.log("列表参数值："+JSON.stringify(parmas));
       // let url = "http://sapi.test.mysipo.com/api_v1/";
@@ -299,7 +298,7 @@ export default {
     },
     open (position,data) {
       if(data){
-        console.log(data);
+        // console.log(data);
         this.list3=data.courseData;
       }
       this[position + 'Popup'] = true

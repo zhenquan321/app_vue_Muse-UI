@@ -1,7 +1,7 @@
 // 配置API接口地址_测试
-var root = 'http://sapi.test.mysipo.com/api_v1/'
+// var root = 'http://sapi.test.mysipo.com/api_v1/'
 // 配置API接口地址_正式
-// var root = 'http://sapi.mysipo.com/api_v1/'
+var root = 'http://sapi.mysipo.com/api_v1/'
 // 引用axios
 var axios = require('axios')
 // 自定义判断元素类型JS

@@ -226,16 +226,10 @@
                   plus.screen.lockOrientation('portrait-primary'); //锁死屏幕方向为竖屏
               });
           };
-          // // IOS监听的事件
-          // videoElem.addEventListener('webkitbeginfullscreen', function() {
-          //     plus.screen.lockOrientation('landscape'); //锁死屏幕方向为横屏
-          // });
-          // videoElem.addEventListener('webkitendfullscreen', function() {
-          // //  plus.screen.unlockOrientation(); //解除屏幕方向的锁定，但是不一定是竖屏；
-          //     plus.screen.lockOrientation('portrait'); //锁死屏幕方向为竖屏
-          // });
         }
-        this.getListIng();
+        setTimeout(() => {
+          this.getListIng();
+        }, 2000)
       },
       createVideo() {
         const s = document.createElement('script');
@@ -282,9 +276,11 @@
       closeAlert (num) {
         this.dialog = false;
         if(num==1){
+          this.ifJT=false;
           this.player.play();
+        }else{
+          this.ifJT=true;
         }
-        this.ifJT=true;
         plus.screen.unlockOrientation(); //解除屏幕方向的锁定
       },
       close() {
@@ -329,8 +325,8 @@
         types[plus.networkinfo.CONNECTION_CELL3G] = "3G蜂窝网络";
         types[plus.networkinfo.CONNECTION_CELL4G] = "4G蜂窝网络";
         this.NetStateStr = types[num];
-        console.log( this.num);
-        console.log( this.NetStateStr);
+        // console.log( this.num);
+        console.log(this.NetStateStr);
         if(this.NetStateStr=="3G蜂窝网络" || this.NetStateStr=="4G蜂窝网络"|| this.NetStateStr=="2G蜂窝网络"){
          console.log(this.player.paused)
          if(this.ifJT){
