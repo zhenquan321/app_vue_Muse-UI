@@ -305,7 +305,8 @@
       },
       //提示
       showToast (mag) {
-        this.toastMasege=mag
+        this.toastMasege=mag;
+        this.toast = true;
         if (this.toastTimer) clearTimeout(this.toastTimer)
         this.toastTimer = setTimeout(() => { this.toast = false }, 2000)
       },

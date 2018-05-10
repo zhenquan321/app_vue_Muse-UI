@@ -72,8 +72,11 @@
 import { domReady, plusReady } from "common/js/ning/index.js";
 import SF from "common/js/App/SFArticle.js";
 import Broadcast from 'common/js/ning/Broadcast.js';
-import Cache from 'common/js/Base/Cache.js'
-import axios from "axios"
+import Cache from 'common/js/Base/Cache.js';
+import axios from "axios";
+import baseURL from '../../../api/IPconfig.js';
+
+
 const broadcast = new Broadcast()
 export default {
   data() {
@@ -133,7 +136,7 @@ export default {
     plusReady() {
       this.cw = plus.webview.currentWebview();
       this.userid = plus.storage.getItem('userid') ? plus.storage.getItem('userid') : '';//'165319'
-      this.userid ='165319';
+      // this.userid ='189837';
       this.getNetData(1,this.num);
     },
     ready() {
@@ -165,7 +168,7 @@ export default {
         }
       }
       this.loading = true;
-      this.$api.get('Course/details', parmas, response => {
+      this.$api.get(baseURL.sapi+'Course/details', parmas, response => {
         // console.log(JSON.stringify(response.data));
         this.loading = false;
         if(response.data.vData.video_type==0){
@@ -225,12 +228,12 @@ export default {
         type:num,
         is_cache:false,
       }
-      this.$api.get('MyCenter/courseList', parmas, response => {
+      this.$api.get(baseURL.sapi+'MyCenter/courseList', parmas, response => {
         this.loading = false;
         // console.log(JSON.stringify(response.data));
         this.noCase=false;
         if(num==2){
-          this.list2=response.data.datainfo;
+          this.list2=response.data.seriesData||response.data.datainfo;
           // console.log(this.list)
         }else if(num==3){
           this.list=response.data.datainfo;

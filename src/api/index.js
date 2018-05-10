@@ -1,7 +1,13 @@
 // 配置API接口地址_测试
-// var root = 'http://sapi.test.mysipo.com/api_v1/'
+var root = {
+  sapi:'http://sapi.test.mysipo.com/api_v1/',
+  appapi_v2:'http://appapi.test.mysipo.com/app_v2/',
+}
 // 配置API接口地址_正式
-var root = 'http://sapi.mysipo.com/api_v1/'
+// var root = {
+//   sapi:'http://sapi.mysipo.com/api_v1/',
+//   appapi_v2:'http://appapi.mysipo.com/app_v2/',
+// }
 // 引用axios
 var axios = require('axios')
 // 自定义判断元素类型JS
@@ -37,27 +43,27 @@ function apiAxios (method, url, params, success, failure) {
     url: url,
     data: method === 'POST' || method === 'PUT' ? params : null,
     params: method === 'GET' || method === 'DELETE' ? params : null,
-    baseURL: root,
+    baseURL: '',
     withCredentials: false
   })
   .then(function (res) {
-    console.log(JSON.stringify(res))
-    if(res.data.code===200||res.data.code===0) {
+    console.log(JSON.stringify(res));
+    if(res.data.code===200||res.data.code===0||res.data.err_no===0) {
       if (success) {
         success(res.data)
       }
     }else{
-        // 相关错误级行为操作
-        if(res.code==1006){
-            //用户未登录相关操作
-        }else if(res.code==1105){
-            
-        }
-        if (failure) {
-            failure(res.data)
-        } else {
-            console.log(res.data);//记录错误
-        }
+      // 相关错误级行为操作
+      if(res.code==1006){
+          //用户未登录相关操作
+      }else if(res.code==1105){
+          
+      }
+      if (failure) {
+          failure(res.data)
+      } else {
+          console.log(res.data);//记录错误
+      }
     } 
   })
   .catch(function (err) {
