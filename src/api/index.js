@@ -1,8 +1,8 @@
 // 配置API接口地址_测试
-var root = {
-  sapi:'http://sapi.test.mysipo.com/api_v1/',
-  appapi_v2:'http://appapi.test.mysipo.com/app_v2/',
-}
+// var root = {
+//   sapi:'http://sapi.test.mysipo.com/api_v1/',
+//   appapi_v2:'http://appapi.test.mysipo.com/app_v2/',
+// }
 // 配置API接口地址_正式
 // var root = {
 //   sapi:'http://sapi.mysipo.com/api_v1/',
@@ -47,22 +47,20 @@ function apiAxios (method, url, params, success, failure) {
     withCredentials: false
   })
   .then(function (res) {
-    console.log(JSON.stringify(res));
     if(res.data.code===200||res.data.code===0||res.data.err_no===0) {
       if (success) {
         success(res.data)
       }
     }else{
       // 相关错误级行为操作
+      console.log(JSON.stringify(res.data) );
       if(res.code==1006){
           //用户未登录相关操作
       }else if(res.code==1105){
           
       }
-      if (failure) {
-          failure(res.data)
-      } else {
-          console.log(res.data);//记录错误
+      if(failure){
+        failure(res.data);
       }
     } 
   })

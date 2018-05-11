@@ -91,6 +91,7 @@
         ifJT:true,
         toast: false,
         toastMasege:'',
+        onlyWifi:true,
         videoData:{},
         courseDataList:[{
           title:"2018相关法精讲训练班：考点精讲课",
@@ -227,9 +228,13 @@
               });
           };
         }
-        setTimeout(() => {
-          this.getListIng();
-        }, 2000)
+        //判断是否是仅wifi播放
+        this.onlyWifi = plus.storage.getItem('onlyWifi');
+        if(this.onlyWifi=="1"){
+          setTimeout(() => {
+            this.getListIng();
+          }, 2000)
+        };
       },
       createVideo() {
         const s = document.createElement('script');
@@ -270,7 +275,6 @@
       },
       openAlert () {
         this.dialog = true;
-    
         plus.screen.lockOrientation('portrait-primary');
       },
       closeAlert (num) {
@@ -314,6 +318,8 @@
         this.toast = false
         if (this.toastTimer) clearTimeout(this.toastTimer)
       },
+       
+      
       //监测网络状态
       getListIng() {  
         var types = [];

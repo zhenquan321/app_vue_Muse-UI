@@ -58,7 +58,7 @@
           <div class="useInfoCard mt10">
             <mu-list >
               <mu-list-item disableRipple  title="工作年龄" class="nackname">
-                <input slot="right" class="Nage"  type="nubmer" v-model="userInfo.worktime" placeholder="请输入工作年龄">
+                <input slot="right" class="Nage" maxlength="2"  type="nubmer" v-model="userInfo.worktime" placeholder="请输入工作年龄">
               </mu-list-item>
               <mu-divider />
               <mu-list-item disableRipple  title="职业">
@@ -332,14 +332,15 @@ export default {
       this.$api.get(baseURL.appapi_v2+'Index/getSettingInfo', parmas, response => {
         this.loading = false;
         console.log("sss"+JSON.stringify(response.data));
-        this.user_conf_role=response.data
-        this.user_conf_gender=response.data
-        this.user_conf_profession=response.data
+        this.user_conf_role=response.data.user_conf.role
+        this.user_conf_gender=response.data.user_conf.gender
+        this.user_conf_profession=response.data.user_conf.profession
         this.getMemberInfo();
       },
       failure => {
         this.loading = false;
         this.noCase=true;
+        this.showToast(failure.err_msg);
       })
     },
     // 信息修改
@@ -360,6 +361,8 @@ export default {
       },
       failure => {
         this.loading = false;
+        this.showToast(failure.err_msg);
+        
       })
     },
     //
@@ -386,6 +389,8 @@ export default {
       failure => {
         this.loading = false;
         this.noCase=true;
+        this.showToast(failure.err_msg);
+        
       })
     },
     //下拉框选择
@@ -435,7 +440,10 @@ export default {
   watch: {
     userInfo:{//深度监听，可监听到对象、数组的变化
         handler(val, oldVal){
-          this.setMemberInfo();
+          let _this = this;  
+          setTimeout(() => {  
+              _this.setMemberInfo();  
+          }, 500);  
         },
         deep:true
     }

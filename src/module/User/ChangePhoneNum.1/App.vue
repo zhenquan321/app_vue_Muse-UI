@@ -1,25 +1,11 @@
 <template>
   <div id="Usetting">
     <mu-linear-progress v-show='loading' />
-    <mu-appbar title="设置"  slot="center">
+    <mu-appbar :title="title"  slot="center">
       <mu-icon-button  icon="arrow_back_ios" slot="left" @click='close' />
       <mu-icon-button  slot="right"/>
     </mu-appbar>
-    <div class="listCard mt20">
-      <mu-list>
-        <mu-list-item title="修改密码" @click="toggle(1)">
-          <span slot="right"><i class="fa fa-chevron-right"></i></span>
-        </mu-list-item>
-         <mu-divider />
-        <mu-list-item title="更换手机号" @click="toggle(2)">
-          <span slot="right"><i class="fa fa-chevron-right"></i></span>
-        </mu-list-item>
-         <mu-divider />
-        <mu-list-item title="修改邮箱" @click="toggle(3)">
-          <span slot="right"><i class="fa fa-chevron-right"></i></span>
-        </mu-list-item>
-      </mu-list>
-    </div>
+
   <div class="listCard mt20">
       <mu-list>
         <mu-list-item title="使用移动流量和WiFi播放视频" @click="onlyWifiFun('0')">
@@ -105,7 +91,7 @@ import SF from "common/js/App/SFArticle.js";
 export default {
   data() {
     return {
-      title:"个人主页",
+      title:"修改手机号",
       list:[],
       index:-1,
       selpage:1,
@@ -146,19 +132,19 @@ export default {
       }else{
         this.onlyWifi=true;
       };
-      // plus.key.addEventListener('backbutton', ()=>{
-		  //   if(this.openChouti){
-      //     this.openChouti=false;
-      //     plus.webview.create('Usetting.html',
-      //     {
-      //       popGesture:"none"
-      //     }
-      //     );
-      //     return
-      //   }else{
-      //     this.close();
-      //   }
-      // }, true);
+      plus.key.addEventListener('backbutton', ()=>{
+		    if(this.openChouti){
+          this.openChouti=false;
+          plus.webview.create('Usetting.html',
+          {
+            popGesture:"none"
+          }
+          );
+          return
+        }else{
+          this.close();
+        }
+      }, true);
     },
     //更新抽屉
     toggle (num) {
