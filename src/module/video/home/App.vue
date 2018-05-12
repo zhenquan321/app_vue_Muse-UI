@@ -77,7 +77,7 @@ import axios from "axios";
 import baseURL from '../../../api/IPconfig.js';
 
 
-const broadcast = new Broadcast()
+
 export default {
   data() {
     return {

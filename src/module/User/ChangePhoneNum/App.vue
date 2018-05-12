@@ -5,14 +5,22 @@
       <mu-icon-button  icon="arrow_back_ios" slot="left" @click='close' />
       <mu-icon-button  slot="right"/>
     </mu-appbar>
-      <div id="changeEmail" >
+      <div id="changeEmail" v-if="typeS==2">
         <h5>更换绑定的手机号之后可以用新手机号及当前密码登录</h5>
         <div>
           <mu-text-field label="请输入原手机号" type="number" @textOverflow="handleInputOverflow(1)" :maxLength="11" class="inputC" fullWidth  :errorText="errorText1"  v-model="oldPhone" labelFloat/>
-          <mu-raised-button  label="获取验证码" @click="sendMobileCodeNew()" class="getAZM demo-raised-button"/><br/>
+          <mu-raised-button  label="获取验证码"  @click="sendMobileCodeNew()" class="getAZM demo-raised-button"/><br/>
           <mu-text-field label="验证码" type="number"  @textOverflow="handleInputOverflow(2)" :maxLength="6" class="inputC mt15-" fullWidth :errorText="errorText2" v-model="mobile_code1" labelFloat/><br/>
         </div>
         <mu-raised-button class="quere mt10" @click="toggle()" label="下一步" fullWidth />
+      </div>
+      <div id="changeEmail" v-if="typeS==1">
+          <div>
+            <mu-text-field label="请输入新手机号" type="number" @textOverflow="handleInputOverflow(3)" :maxLength="11" class="inputC " fullWidth :errorText="errorText3" v-model="oldPhone" labelFloat/>
+            <mu-raised-button label="获取验证码" style="top:50px!important"  @click="sendMobileCodeNew()" class="getAZM demo-raised-button"/><br/>
+            <mu-text-field label="验证码" type="number"  @textOverflow="handleInputOverflow(4)" :maxLength="6" class="inputC mt15-" fullWidth :errorText="errorText4" v-model="mobile_code1"  labelFloat/><br/>
+          </div>
+          <mu-raised-button class="quere mt10" @click="bindingMobile()" label="立即绑定" fullWidth />
       </div>
      <template>
       <div>
@@ -24,7 +32,7 @@
               <mu-raised-button label="获取验证码" @click="sendMobileCodeNew()" class="getAZM demo-raised-button"/><br/>
               <mu-text-field label="验证码" type="number"  @textOverflow="handleInputOverflow(4)" :maxLength="6" class="inputC mt15-" fullWidth :errorText="errorText4" v-model="mobile_code2"  labelFloat/><br/>
             </div>
-            <mu-raised-button class="quere mt10" @click="bindingMobile()" label="立即绑定" fullWidth />
+            <mu-raised-button class="quere mt10" @click="replaceMobile()" label="立即绑定" fullWidth />
           </div>
         </mu-drawer>
       </div>
@@ -45,13 +53,15 @@ import Cache from 'common/js/Base/Cache.js';
 import axios from "axios";
 import baseURL from '../../../api/IPconfig.js';
 import md5 from '../../../api/md5.js';
-
+const broadcast = new Broadcast();
 export default {
   data() {
     return {
       title:"更换手机号",
       toast:false,
+      typeS:1,
       openChouti:false,
+      loading:false,
       errorText1:'',
       errorText2:'',
       errorText3:'',
@@ -60,6 +70,7 @@ export default {
       newPhone:'',
       mobile_code1:'',
       mobile_code2:'',
+      regex:/^1([358][0-9]|4[579]|66|7[0135678]|9[89])[0-9]{8}$/
     };
   },
   created() {
@@ -78,19 +89,19 @@ export default {
     },
     plusReady() {
       this.cw = plus.webview.currentWebview();
-      setTimeout(function () { 
-        plus.webview.currentWebview().show('slide-in-right', 250);
-        plus.nativeUI.closeWaiting();
-      }, 250);
+      this.title = this.cw.title;
+      this.typeS = this.cw.typeS;
+      plus.webview.currentWebview().show('slide-in-right', 250);
+      plus.nativeUI.closeWaiting();
       this.token = plus.storage.getItem('token') ? plus.storage.getItem('token') : '';
       this.getMemberInfo();
     },
     //获取用户基本信息
     getMemberInfo() {
-      this.loading = true;
       const parmas={
         token:this.token,
       }
+      this.loading = true;
       this.$api.get(baseURL.appapi_v2+'Userinfo/getMemberInfo', parmas, response => {
         this.loading = false;
         this.userInfo=response.data;
@@ -104,26 +115,14 @@ export default {
     //获取验证码
     sendMobileCodeNew() {
       this.clearInfo();
-      this.loading = true;
-      if(!this.openChouti){
-        if(!this.newPhone){
-          console.log(this.newPhone)
-          this.showToast("请输入新手机号");
+      if(this.typeS==1){
+        if(!this.oldPhone){
+          console.log(this.oldPhone)
+          this.showToast("请输入手机号");
           return
         }
-        var parmas={
-          mobile:this.newPhone,// string	Y	手机号
-          // mobile_code:this.oldPhone,//	string	Y	手机动态码
-          mobile_sign: md5(md5(this.newPhone)+'M123456'),//	string	Y	手机号加密后字符串 md5(md5('手机号').M123456)
-          token:this.token,//	string	N	用户token
-          // mobile_code_type:5,//	string	Y	动态码类型：5
-          type:6,//:this.oldPhone,//	int	Y	5	类型[1]手机号动态登录[2]注册绑定手机号[3]找回密码[4]个人中心绑定手机[5]更改认证手机
-          access_sign:"mysipo",//	string	Y	密匙为: mysipo
-        }
-      }else{
-         console.log(this.newPhone)
-        if(!this.oldPhone){
-          this.showToast("请输入手机号");
+        if(!this.regex.test(this.oldPhone)){
+          this.showToast("请输入正确手机号");
           return
         }
         var parmas={
@@ -132,10 +131,50 @@ export default {
           mobile_sign: md5(md5(this.oldPhone)+'M123456'),//	string	Y	手机号加密后字符串 md5(md5('手机号').M123456)
           token:this.token,//	string	N	用户token
           // mobile_code_type:5,//	string	Y	动态码类型：5
-          type:5,//:this.oldPhone,//	int	Y	5	类型[1]手机号动态登录[2]注册绑定手机号[3]找回密码[4]个人中心绑定手机[5]更改认证手机
+          type:4,//:this.oldPhone,//	int	Y	5	类型[1]手机号动态登录[2]注册绑定手机号[3]找回密码[4]个人中心绑定手机[5]更改认证手机
           access_sign:"mysipo",//	string	Y	密匙为: mysipo
+      }
+      }else{
+        if(this.openChouti){
+          if(!this.newPhone){
+            console.log(this.newPhone)
+            this.showToast("请输入新手机号");
+            return
+          }
+         if(!this.regex.test(this.newPhone)){
+          this.showToast("请输入正确手机号");
+          return
+         }
+          var parmas={
+            mobile:this.newPhone,// string	Y	手机号
+            // mobile_code:this.oldPhone,//	string	Y	手机动态码
+            mobile_sign: md5(md5(this.newPhone)+'M123456'),//	string	Y	手机号加密后字符串 md5(md5('手机号').M123456)
+            token:this.token,//	string	N	用户token
+            // mobile_code_type:5,//	string	Y	动态码类型：5
+            type:6,//:this.oldPhone,//	int	Y	5	类型[1]手机号动态登录[2]注册绑定手机号[3]找回密码[4]个人中心绑定手机[5]更改认证手机
+            access_sign:"mysipo",//	string	Y	密匙为: mysipo
+          }
+        }else{
+          if(!this.oldPhone){
+            this.showToast("请输入手机号");
+            return
+          }
+          if(!this.regex.test(this.oldPhone)){
+          this.showToast("请输入正确手机号");
+          return
+         }
+          var parmas={
+            mobile:this.oldPhone,// string	Y	手机号
+            // mobile_code:this.oldPhone,//	string	Y	手机动态码
+            mobile_sign: md5(md5(this.oldPhone)+'M123456'),//	string	Y	手机号加密后字符串 md5(md5('手机号').M123456)
+            token:this.token,//	string	N	用户token
+            // mobile_code_type:5,//	string	Y	动态码类型：5
+            type:5,//:this.oldPhone,//	int	Y	5	类型[1]手机号动态登录[2]注册绑定手机号[3]找回密码[4]个人中心绑定手机[5]更改认证手机
+            access_sign:"mysipo",//	string	Y	密匙为: mysipo
+          }
         }
       }
+      this.loading = true;
       console.log(JSON.stringify(parmas));
       this.$api.get(baseURL.api_v1+'Service/sendMobileCode', parmas, response => {
         this.loading = false;
@@ -152,6 +191,10 @@ export default {
       if(!this.oldPhone){
         this.showToast("请输入原手机号");
          return
+      }
+       if(!this.regex.test(this.oldPhone)){
+          this.showToast("请输入正确手机号");
+          return
       }
       if(!this.mobile_code1){
         this.showToast("请输入验证码");
@@ -180,10 +223,48 @@ export default {
     //绑定手机号
     bindingMobile() {
       this.clearInfo();
+      if(!this.oldPhone){
+        this.showToast("请输入新手机号");
+        return
+      }
+      if(!this.regex.test(this.oldPhone)){
+          this.showToast("请输入正确手机号");
+          return
+      }
+      if(!this.mobile_code1){
+        this.showToast("请输入验证码");
+        return
+      }
+      const parmas={
+        mobile:this.oldPhone,// string	Y	手机号
+        code:this.mobile_code1,//	string	Y	动态码
+        mobile_sign: md5(md5(this.oldPhone)+'M123456'),//	string	Y	手机号加密后字符串 md5(md5('手机号').M123456)
+        token:this.token,//	string	N	用户token
+      }
       this.loading = true;
+      console.log(parmas);
+      this.$api.get(baseURL.api_v1+'Userinfo/bindingMobile', parmas, response => {
+         this.showToast("手机号绑定成功");
+         broadcast.send('changemusic2', {
+            data: this.courseData
+         }, { ids: ['UInformation.html'] })
+         setTimeout(() => {  this.close() }, 500)
+      },
+      failure => {
+        this.loading = false;
+        this.showToast(failure.err_msg);
+      })
+    },
+    //修改绑定手机号
+    replaceMobile() {
+      this.clearInfo();
       if(!this.newPhone){
         this.showToast("请输入新手机号");
         return
+      }
+      if(!this.regex.test(this.newPhone)){
+          this.showToast("请输入正确手机号");
+          return
       }
       if(!this.mobile_code2){
         this.showToast("请输入验证码");
@@ -191,14 +272,15 @@ export default {
       }
       const parmas={
         mobile:this.newPhone,// string	Y	手机号
-        code:this.mobile_code2,//	string	Y	动态码
+        mobile_code:this.mobile_code2,//	string	Y	动态码
         mobile_sign: md5(md5(this.newPhone)+'M123456'),//	string	Y	手机号加密后字符串 md5(md5('手机号').M123456)
         token:this.token,//	string	N	用户token
       }
-      console.log(parmas);
-      this.$api.get(baseURL.api_v1+'Userinfo/bindingMobile', parmas, response => {
-         this.showToast("手机号修改成功");
-         this.close();
+      this.loading = true;
+      console.log(JSON.stringify(parmas));
+      this.$api.get(baseURL.api_v1+'Userinfo/replaceMobile', parmas, response => {
+         this.showToast("手机号修改绑定成功");
+         setTimeout(() => {  this.close() }, 500)
       },
       failure => {
         this.loading = false;

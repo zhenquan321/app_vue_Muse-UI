@@ -17,8 +17,9 @@
           <p v-if="!userInfo.introduce" class="noIntd">无个人简介</p>
         </div>
         <div class="tuRight">
-            <img src="https://bbs.mysipo.com//uc_server/avatar.php?uid=138880&size=small" alt="">
-            <span><img src="../static/img/xiugai.png" alt=""></span>
+            <img v-show="!userInfo.headimg"  src="https://bbs.mysipo.com//uc_server/avatar.php?uid=138880&size=small" alt="">
+            <img v-show="userInfo.headimg"  :src="userInfo.headimg" alt="">
+            <span  @click="openBottomSheet(4)"><img src="../static/img/xiugai.png" alt=""></span>
         </div>
       </div>
       <template>
@@ -29,17 +30,17 @@
                 <!-- @click="open" 暂时不修改昵称 -->
                 <span slot="right" v-if="userInfo.nickname">{{userInfo.nickname}}</span>
                 <span slot="right" v-if="!userInfo.nickname">添加昵称</span>
-                <span slot="right" ><i class="fa fa-chevron-right"></i></span>
+                <!-- <span slot="right" ><i class="fa fa-chevron-right"></i></span> -->
               </mu-list-item>
               <mu-divider />
               <mu-list-item disableRipple  title="手机号">
                 <span slot="right" v-if="userInfo.mobile">{{userInfo.mobile}}</span>
-                <span slot="right" v-if="!userInfo.mobile" @click="toggle(1)">绑定手机号</span>
+                <span slot="right" v-if="!userInfo.mobile" @click="bindingPhone()">绑定手机号</span>
               </mu-list-item>
               <mu-divider />
               <mu-list-item disableRipple  title="邮箱">
-                <span slot="right" v-if="userInfo.email">{{userInfo.email}}</span>
-                <span slot="right" v-if="!userInfo.email" @click="toggle(2)">绑定邮箱</span>
+                <span slot="right" v-if="userInfo.email" >{{userInfo.email}}</span>
+                <span slot="right" v-if="!userInfo.email" @click="ChangeMailbox()">绑定邮箱</span>
               </mu-list-item>
               <mu-divider />
               <mu-list-item disableRipple  title="用户等级" >
@@ -49,9 +50,10 @@
               </mu-list-item>
               <mu-divider />
               <mu-list-item disableRipple  title="性别">
-                <span slot="right" v-if="UserGender" @click="openBottomSheet(2)">{{UserGender}}</span>
-                <span slot="right" v-if="!UserGender" @click="openBottomSheet(2)">设置性别</span>
-                <span slot="right" @click="openBottomSheet(2)"><i class="fa fa-chevron-right"></i></span>
+                <span slot="right" v-if="UserGender" >{{UserGender}}</span>
+                <span slot="right" v-if="!UserGender">设置性别</span>
+                <!-- 性别和昵称一起暂不支持修改 -->
+                <!-- <span slot="right" @click="openBottomSheet(2)"><i class="fa fa-chevron-right"></i></span> -->
               </mu-list-item>
             </mu-list>
           </div>
@@ -99,6 +101,12 @@
           <mu-list-item class="mt5" title="取消"/>
         </mu-list>
       </mu-bottom-sheet>
+      <mu-bottom-sheet :open="bottomSheet==4" @close="closeBottomSheet" >
+        <mu-list @itemClick="closeBottomSheet" class="pt0 pb0" >
+          <mu-list-item title="从相册中选择头像" @click="galleryImg()" />
+          <mu-list-item class="mt5" title="取消"/>
+        </mu-list>
+      </mu-bottom-sheet>
     </template>
     <template>
       <div id="UIdialog">
@@ -115,7 +123,7 @@
       </div>
     </template>
     <template>
-      <div>
+      <div v-show="tomStyle">
         <mu-toast v-if="toast" :message="toastMasege" @close="hideToast"/> 
       </div>
     </template>
@@ -162,7 +170,7 @@ import Broadcast from 'common/js/ning/Broadcast.js';
 import Cache from 'common/js/Base/Cache.js';
 import axios from "axios";
 import baseURL from '../../../api/IPconfig.js';
-console.log("_______________"+baseURL.sapi);
+const broadcast = new Broadcast();
 export default {
   data() {
     return {
@@ -178,6 +186,7 @@ export default {
       token:'',
       setnickname:'',
       index:-1,
+      tomStyle:false,
       dialog: false,
       activeIndex:1,
       bottomSheet: 0,
@@ -266,6 +275,9 @@ export default {
   created() {
     this.ready();
     plusReady(this.plusReady);
+    broadcast.listen('changemusic2', (data) => {
+        this.setMemberInfo();
+    })
   },
   mounted() {
     this.scroller = this.$el;
@@ -278,6 +290,7 @@ export default {
       console.log("缓存数据哦：" + JSON.stringify(this.sf.getLocalData()));
       //获取网络数据 下拉
       this.index = 1;
+      setTimeout(() => {  this.tomStyle=true }, 5000)
     },
     plusReady() {
       this.cw = plus.webview.currentWebview();
@@ -286,7 +299,9 @@ export default {
         plus.nativeUI.closeWaiting();
       }, 300);
       this.token = plus.storage.getItem('token') ? plus.storage.getItem('token') : '';
+      this.headimg = plus.storage.getItem('headimg') ? plus.storage.getItem('headimg') : '';
       this.getSettingInfo();
+     
     },
     //更新抽屉
     toggle (num) {
@@ -353,11 +368,11 @@ export default {
         introduce:this.userInfo.introduce,
         role:this.userInfo.role,
       }
-      console.log(parmas);
+      console.log(JSON.stringify(parmas));
       this.$api.get(baseURL.appapi_v2+'Userinfo/setMemberInfo', parmas, response => {
         this.loading = false;
         this.showToast("用户信息修改成功！")
-        this.getMemberInfo();
+        //this.getMemberInfo();
       },
       failure => {
         this.loading = false;
@@ -384,6 +399,10 @@ export default {
         this.selUserRole();
         this.selUserprofessional();
         this.selgender();
+        if( this.headimg!= this.userInfo.headimg){
+          this.headimg= this.userInfo.headimg
+          plus.storage.setItem('headimg',this.headimg);
+        }
         console.log(JSON.stringify(this.userInfo));
       },
       failure => {
@@ -430,6 +449,100 @@ export default {
           }
         }
     },
+    //绑定手机号
+    bindingPhone(){
+      let page = "ChangePhoneNum.html";
+      let ow = plus.webview.create(
+        page,
+        page,
+        {
+          popGesture: "close"
+        },
+        {
+          title:"绑定手机号",
+          typeS:1,
+        }
+      );
+      ow.onloading = () => {
+        plus.nativeUI.showWaiting();
+        // ow.show("pop-in", 250);
+      };
+    },
+    ChangeMailbox(){
+      let page = "ChangeMailbox.html";
+      let ow = plus.webview.create(
+        page,
+        page,
+        {
+          popGesture: "close"
+        },
+        {
+          title:"绑定邮箱",
+          typeS:1,
+        }
+      );
+      ow.onloading = () => {
+        plus.nativeUI.showWaiting();
+        // ow.show("pop-in", 250);
+      };
+    },
+    //修改头像
+    galleryImg() {
+      plus.gallery.pick(function(a) {
+        plus.io.resolveLocalFileSystemURL(a, function(entry) {
+            var imgsrc=a;
+            plus.nativeUI.showWaiting();
+            var task = null;
+            task = plus.uploader.createUpload(baseURL.api_v1 + '/Userinfo/setHeadimg', {
+              method: "POST",
+              blocksize: 409600,
+              priority: 100
+            }, function(t, status) {
+              plus.nativeUI.closeWaiting();
+              var jsonObj = eval('(' + t.responseText + ')');
+              console.log(JSON.stringify(jsonObj)) 
+              if (jsonObj.err_no == 0) {
+                plus.storage.setItem('headimg', jsonObj.data.m_headimg);
+                console.log(jsonObj.data.m_headimg)
+                // mui.toast("修改成功");
+                return false;
+              } else {
+                // mui.toast(jsonObj.err_msg);
+                return false;
+              }
+                // mui.toast('上传成功' + t.responseText)
+            });
+            task.addFile(imgsrc, {
+              key: 'image'
+            });
+            var gettoken = plus.storage.getItem('token') ? plus.storage.getItem('token') : '';
+            var getuid = plus.storage.getItem('userid') ? plus.storage.getItem('userid') : '';
+            task.addData('uid', getuid);
+            task.addData('token', gettoken);
+            task.start();
+        }, function(e) {
+          console.log("读取拍照文件错误：" + e.message);
+        });
+      }, function(a) {}, {
+        filter: "image"
+      })
+      this.ifUpload2();
+    },
+    //确定是否上传成功
+    ifUpload2(){
+      this.headimg = plus.storage.getItem('headimg') ? plus.storage.getItem('headimg') : '';
+      if(this.headimg== this.userInfo.headimg){
+        setTimeout(()=>{
+          this.ifUpload2();
+        },300)
+      }else{
+        this.userInfo.headimg=this.headimg;
+        // this.showToast("修改成功");
+        this.tomStyle=false;
+        setTimeout(() => { this.tomStyle=true }, 5000);
+      }
+    },
+
     closeBottomSheet () {
       this.bottomSheet = 0
     },

@@ -7,15 +7,15 @@
     </mu-appbar>
     <div class="listCard mt20">
       <mu-list>
-        <mu-list-item title="修改密码" @click="toggle(1)">
+        <mu-list-item title="修改密码" @click="ModifyPassword()">
           <span slot="right"><i class="fa fa-chevron-right"></i></span>
         </mu-list-item>
          <mu-divider />
-        <mu-list-item title="更换手机号" @click="toggle(2)">
+        <mu-list-item title="更换手机号" @click="bindingPhone()">
           <span slot="right"><i class="fa fa-chevron-right"></i></span>
         </mu-list-item>
          <mu-divider />
-        <mu-list-item title="修改邮箱" @click="toggle(3)">
+        <mu-list-item title="修改邮箱" @click="ChangeMailbox()">
           <span slot="right"><i class="fa fa-chevron-right"></i></span>
         </mu-list-item>
       </mu-list>
@@ -283,6 +283,61 @@ export default {
           plus.nativeUI.showWaiting();
           // ow.show("pop-in", 250);
         };
+    },
+    //修改手机号
+    bindingPhone(){
+      let page = "ChangePhoneNum.html";
+      let ow = plus.webview.create(
+        page,
+        page,
+        {
+          popGesture: "close"
+        },
+        {
+          title:"修改手机号",
+          typeS:2,
+        }
+      );
+      ow.onloading = () => {
+        plus.nativeUI.showWaiting();
+        // ow.show("pop-in", 250);
+      };
+    },
+    //修改邮箱
+    ChangeMailbox(){
+      let page = "ChangeMailbox.html";
+      let ow = plus.webview.create(
+        page,
+        page,
+        {
+          popGesture: "close"
+        },
+        {
+          title:"修改邮箱",
+          typeS:2,
+        }
+      );
+      ow.onloading = () => {
+        plus.nativeUI.showWaiting();
+        // ow.show("pop-in", 250);
+      };
+    },
+    //修改密码
+    ModifyPassword(){
+      let page = "ModifyPassword.html";
+      let ow = plus.webview.create(
+        page,
+        page,
+        {
+          popGesture: "close"
+        },
+        {
+        }
+      );
+      ow.onloading = () => {
+        plus.nativeUI.showWaiting();
+        // ow.show("pop-in", 250);
+      };
     },
     close() {
       this.cw.close()
