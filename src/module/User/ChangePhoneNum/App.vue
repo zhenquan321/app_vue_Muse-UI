@@ -16,7 +16,7 @@
       </div>
       <div id="changeEmail" v-if="typeS==1">
           <div>
-            <mu-text-field label="请输入新手机号" type="number" @textOverflow="handleInputOverflow(3)" :maxLength="11" class="inputC " fullWidth :errorText="errorText3" v-model="oldPhone" labelFloat/>
+            <mu-text-field label="请输入手机号" type="number" @textOverflow="handleInputOverflow(3)" :maxLength="11" class="inputC " fullWidth :errorText="errorText3" v-model="oldPhone" labelFloat/>
             <mu-raised-button label="获取验证码" style="top:50px!important"  @click="sendMobileCodeNew()" class="getAZM demo-raised-button"/><br/>
             <mu-text-field label="验证码" type="number"  @textOverflow="handleInputOverflow(4)" :maxLength="6" class="inputC mt15-" fullWidth :errorText="errorText4" v-model="mobile_code1"  labelFloat/><br/>
           </div>
@@ -53,6 +53,8 @@ import Cache from 'common/js/Base/Cache.js';
 import axios from "axios";
 import baseURL from '../../../api/IPconfig.js';
 import md5 from '../../../api/md5.js';
+import sign from '../../../api/sign.js';
+
 const broadcast = new Broadcast();
 export default {
   data() {
@@ -98,14 +100,19 @@ export default {
     },
     //获取用户基本信息
     getMemberInfo() {
-      const parmas={
+      let parmas={
         token:this.token,
       }
+      parmas = sign.signAfterObj(parmas);
       this.loading = true;
       this.$api.get(baseURL.appapi_v2+'Userinfo/getMemberInfo', parmas, response => {
         this.loading = false;
         this.userInfo=response.data;
         this.oldPhone=this.userInfo.mobile;
+        if(this.oldPhone==""||this.oldPhone==undefined){
+            this.title = "绑定手机号";
+            this.typeS = 1;
+        }
       },
       failure => {
         this.loading = false;
@@ -201,7 +208,7 @@ export default {
          return
       }
       this.loading = true;
-      const parmas={
+      let parmas={
         mobile:this.oldPhone,// string	Y	手机号
         code:this.mobile_code1,//	string	Y	动态码
         // mobile_code:this.oldPhone,//	string	Y	手机动态码
@@ -211,6 +218,7 @@ export default {
         type:5,//:this.oldPhone,//	int	Y	5	类型[1]手机号动态登录[2]注册绑定手机号[3]找回密码[4]个人中心绑定手机[5]更改认证手机
         // access_sign:"mysipo",//	string	Y	密匙为: mysipo
       }
+      parmas = sign.signAfterObj(parmas);
       this.$api.get(baseURL.api_v1+'Userregister/verifyMobileCode', parmas, response => {
         this.loading = false;
         this.openChouti = true;
@@ -235,12 +243,13 @@ export default {
         this.showToast("请输入验证码");
         return
       }
-      const parmas={
+      let parmas={
         mobile:this.oldPhone,// string	Y	手机号
         code:this.mobile_code1,//	string	Y	动态码
         mobile_sign: md5(md5(this.oldPhone)+'M123456'),//	string	Y	手机号加密后字符串 md5(md5('手机号').M123456)
         token:this.token,//	string	N	用户token
       }
+      parmas = sign.signAfterObj(parmas);
       this.loading = true;
       console.log(parmas);
       this.$api.get(baseURL.api_v1+'Userinfo/bindingMobile', parmas, response => {
@@ -248,7 +257,7 @@ export default {
          broadcast.send('changemusic2', {
             data: this.courseData
          }, { ids: ['UInformation.html'] })
-         setTimeout(() => {  this.close() }, 500)
+         setTimeout(() => {  this.close() }, 1000)
       },
       failure => {
         this.loading = false;
@@ -270,17 +279,18 @@ export default {
         this.showToast("请输入验证码");
         return
       }
-      const parmas={
+      let parmas={
         mobile:this.newPhone,// string	Y	手机号
         mobile_code:this.mobile_code2,//	string	Y	动态码
         mobile_sign: md5(md5(this.newPhone)+'M123456'),//	string	Y	手机号加密后字符串 md5(md5('手机号').M123456)
         token:this.token,//	string	N	用户token
       }
+      parmas = sign.signAfterObj(parmas);
       this.loading = true;
       console.log(JSON.stringify(parmas));
       this.$api.get(baseURL.api_v1+'Userinfo/replaceMobile', parmas, response => {
          this.showToast("手机号修改绑定成功");
-         setTimeout(() => {  this.close() }, 500)
+         setTimeout(() => {  this.close() }, 1000)
       },
       failure => {
         this.loading = false;

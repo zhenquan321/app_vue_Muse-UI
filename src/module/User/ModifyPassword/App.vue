@@ -29,6 +29,8 @@ import Cache from 'common/js/Base/Cache.js';
 import axios from "axios";
 import baseURL from '../../../api/IPconfig.js';
 import md5 from '../../../api/md5.js';
+import sign from '../../../api/sign.js';
+
 const broadcast = new Broadcast()
 export default {
   data() {
@@ -88,12 +90,13 @@ export default {
         return
       }
       this.loading = true;
-      const parmas={
+      let parmas={
         uid:this.userid,// string	Y	邮箱
         password_old:this.password_old,//	string	Y	动态码
         token:this.token,//	string	N	用户token
         password_new:this.password_new,//:this.oldEmail,//	int	Y	5	类型[1]邮箱动态登录[2]注册绑定邮箱[3]找回密码[4]个人中心绑定手机[5]更改认证手机
       }
+      parmas = sign.signAfterObj(parmas);
       console.log(JSON.stringify(parmas))
       this.$api.get(baseURL.api_v1+'Userinfo/editPass', parmas, response => {
         this.loading = false;

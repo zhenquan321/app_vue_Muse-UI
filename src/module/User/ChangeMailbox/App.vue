@@ -10,7 +10,7 @@
         <div>
           <mu-text-field label="请输入原邮箱账号"  class="inputC" fullWidth  :errorText="errorText1"  v-model="oldEmail" labelFloat/>
           <mu-raised-button  label="获取验证码" @click="sendEmailCodeNew()" class="getAZM demo-raised-button"/><br/>
-          <mu-text-field label="验证码"   class="inputC mt15-" fullWidth :errorText="errorText2" v-model="mobile_code1" labelFloat/><br/>
+          <mu-text-field label="验证码"   @textOverflow="handleInputOverflow(2)" :maxLength="6"  class="inputC mt15-" fullWidth :errorText="errorText2" v-model="mobile_code1" labelFloat/><br/>
         </div>
         <mu-raised-button class="quere mt10" @click="toggle()" label="下一步" fullWidth />
       </div>
@@ -53,6 +53,8 @@ import Cache from 'common/js/Base/Cache.js';
 import axios from "axios";
 import baseURL from '../../../api/IPconfig.js';
 import md5 from '../../../api/md5.js';
+import sign from '../../../api/sign.js';
+
 const broadcast = new Broadcast()
 export default {
   data() {
@@ -100,13 +102,18 @@ export default {
     //获取用户基本信息
     getMemberInfo() {
       this.loading = true;
-      const parmas={
+      let parmas={
         token:this.token,
       }
+      parmas = sign.signAfterObj(parmas);
       this.$api.get(baseURL.appapi_v2+'Userinfo/getMemberInfo', parmas, response => {
         this.loading = false;
         this.userInfo=response.data;
         this.oldEmail=this.userInfo.email;
+        if(this.oldEmail==""||this.oldEmail==undefined){
+            this.title = "绑定邮箱";
+            this.typeS = 1;
+        }
         console.log(JSON.stringify(response.data));
       },
       failure => {
@@ -157,7 +164,7 @@ export default {
             email_sign: md5(md5(this.newEmail)+'E123456'),//	string	Y	邮箱加密后字符串 md5(md5('邮箱').M123456)
             token:this.token,//	string	N	用户token
             // mobile_code_type:5,//	string	Y	动态码类型：5
-            type:5,//:this.oldEmail,//	int	Y	5		类型[1]注册绑定邮箱[2]找回密码邮箱[3]绑定邮箱[4]更换旧邮箱动态码[5]更换新邮箱动态码
+            type:5,//	int	Y	5		类型[1]注册绑定邮箱[2]找回密码邮箱[3]绑定邮箱[4]更换旧邮箱动态码[5]更换新邮箱动态码
             access_sign:"mysipo",//	string	Y	密匙为: mysipo
           }
         }else{
@@ -181,6 +188,7 @@ export default {
         }
       }
       this.loading = true;
+      parmas = sign.signAfterObj(parmas);
       console.log(JSON.stringify(parmas));
       this.$api.get(baseURL.api_v1+'Service/sendEmail', parmas, response => {
         this.loading = false;
@@ -207,12 +215,13 @@ export default {
          return
       }
       this.loading = true;
-      const parmas={
+      let parmas={
         email:this.oldEmail,// string	Y	邮箱
         code:this.mobile_code1.replace(/(^\s*)|(\s*$)/g, ""),//	string	Y	动态码
         token:this.token,//	string	N	用户token
         type:4,//:this.oldEmail,//	int	Y	5	类型[1]邮箱动态登录[2]注册绑定邮箱[3]找回密码[4]个人中心绑定手机[5]更改认证手机
       }
+      parmas = sign.signAfterObj(parmas);
       console.log(JSON.stringify(parmas))
       this.$api.get(baseURL.api_v1+'Userregister/verifyEmailCode', parmas, response => {
         this.loading = false;
@@ -238,7 +247,7 @@ export default {
         this.showToast("请输入验证码");
         return
       }
-      const parmas={
+      let parmas={
         email:this.oldEmail,// string	Y	邮箱
         email_code:this.mobile_code1,//	string	Y	动态码
         email_sign: md5(md5(this.oldEmail)+'E123456'),//	string	Y	邮箱加密后字符串 md5(md5('邮箱').M123456)
@@ -246,13 +255,14 @@ export default {
       }
       this.loading = true;
       console.log(parmas);
+      parmas = sign.signAfterObj(parmas);
       this.$api.get(baseURL.api_v1+'Userinfo/bindingEmail', parmas, response => {
          this.showToast("绑定成功！");
          //广播事件
          broadcast.send('changemusic2', {
             data: this.courseData
          }, { ids: ['UInformation.html'] })
-         setTimeout(() => {  this.close() }, 500)
+         setTimeout(() => {  this.close() }, 1000)
       },
       failure => {
         this.loading = false;
@@ -274,17 +284,18 @@ export default {
         this.showToast("请输入验证码");
         return
       }
-      const parmas={
+      let parmas={
         email:this.newEmail,// string	Y	邮箱
         email_code:this.mobile_code2,//	string	Y	动态码
         email_sign: md5(md5(this.newEmail)+'E123456'),//	string	Y	邮箱加密后字符串 md5(md5('邮箱').M123456)
         token:this.token,//	string	N	用户token
       }
       this.loading = true;
-      console.log(parmas);
+      parmas = sign.signAfterObj(parmas);
+      console.log(JSON.stringify(parmas));
       this.$api.get(baseURL.api_v1+'Userinfo/replaceEmail', parmas, response => {
          this.showToast("绑定成功！");
-         setTimeout(() => {  this.close() }, 500)
+         setTimeout(() => {  this.close() }, 1000)
       },
       failure => {
         this.loading = false;

@@ -16,10 +16,10 @@
           <p v-if="userInfo.introduce">{{userInfo.introduce}}</p>
           <p v-if="!userInfo.introduce" class="noIntd">无个人简介</p>
         </div>
-        <div class="tuRight">
+        <div class="tuRight" @click="openBottomSheet(4)">
             <img v-show="!userInfo.headimg"  src="https://bbs.mysipo.com//uc_server/avatar.php?uid=138880&size=small" alt="">
             <img v-show="userInfo.headimg"  :src="userInfo.headimg" alt="">
-            <span  @click="openBottomSheet(4)"><img src="../static/img/xiugai.png" alt=""></span>
+            <span  ><img src="../static/img/xiugai.png" alt=""></span>
         </div>
       </div>
       <template>
@@ -170,6 +170,9 @@ import Broadcast from 'common/js/ning/Broadcast.js';
 import Cache from 'common/js/Base/Cache.js';
 import axios from "axios";
 import baseURL from '../../../api/IPconfig.js';
+import md5 from '../../../api/md5.js';
+import sign from '../../../api/sign.js';
+
 const broadcast = new Broadcast();
 export default {
   data() {
@@ -341,9 +344,10 @@ export default {
     //获取设置字典
     getSettingInfo() {
       this.loading = true;
-      const parmas={
+      let parmas={
         token:this.token,
       }
+      parmas = sign.signAfterObj(parmas);
       this.$api.get(baseURL.appapi_v2+'Index/getSettingInfo', parmas, response => {
         this.loading = false;
         console.log("sss"+JSON.stringify(response.data));
@@ -361,13 +365,14 @@ export default {
     // 信息修改
     setMemberInfo() {
       this.loading = true;
-      const parmas={
+      let parmas={
         token:this.token,
         worktime:this.userInfo.worktime,
         professional:this.userInfo.professional,
         introduce:this.userInfo.introduce,
         role:this.userInfo.role,
       }
+      parmas = sign.signAfterObj(parmas);
       console.log(JSON.stringify(parmas));
       this.$api.get(baseURL.appapi_v2+'Userinfo/setMemberInfo', parmas, response => {
         this.loading = false;
@@ -390,9 +395,10 @@ export default {
     //获取用户基本信息
     getMemberInfo() {
       this.loading = true;
-      const parmas={
+      let parmas={
         token:this.token,
       }
+      parmas = sign.signAfterObj(parmas);
       this.$api.get(baseURL.appapi_v2+'Userinfo/getMemberInfo', parmas, response => {
         this.loading = false;
         this.userInfo=response.data;
