@@ -465,11 +465,26 @@
     position: relative;
     text-align: right;
     padding-top: 1px;
-    img{
+    width: 84px;
+    height: 84px;
+    div{
       border: 4px solid #fff;
       border-radius:50%;
       width: 84px;
       height: 84px;
+      text-align: center;
+      overflow: hidden;
+      position: relative;
+      img{
+        min-width: 76px;
+        max-width: 76px;
+        max-height: 76px;
+        min-height: 76px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        margin: -38px 0 0 -38px;
+      }
     }
     span{
       display: inline-block;
@@ -680,3 +695,49 @@
   }
 }
 
+.videoBoxD{
+  position: relative;
+  .bjCard{
+    position: absolute;
+    height: 100%;
+    img{
+      vertical-align: top;
+      height: 100%;
+    }
+  }
+  .infoCard{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    text-align: center;
+    div{
+      margin-top: 62px;
+    }
+    img{
+      width: 60px;
+      margin-bottom: 3px;
+    }
+    h5{
+      font-size: 15px;
+      color: #fff;
+      margin: 5px;
+    }
+    h4{
+      font-size: 15px;
+      color: #fff;
+      margin: 5px;
+    }
+    span{
+      margin-top: 5px;
+      height: 34px;
+      border: 2px solid #2ce6b9;
+      display: inline-block;
+      width: 140px;
+      border-radius: 17px;
+      line-height: 34px;
+      color: #2ce6b9;
+      font-size: 18px;
+    }
+  }
+}

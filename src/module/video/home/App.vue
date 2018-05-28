@@ -75,7 +75,7 @@ import Broadcast from 'common/js/ning/Broadcast.js';
 import Cache from 'common/js/Base/Cache.js';
 import axios from "axios";
 import baseURL from '../../../api/IPconfig.js';
-
+import $ from '../../../api/jquery-vendor';
 
 
 export default {
@@ -158,19 +158,34 @@ export default {
         }
     },
     onClick(item) {
-      if(item.type==1){
-        this.openAlert('抱歉,亲~！当前课程为直播课，开发小哥正在紧急开发APP直播系统中，请前往网站观看~')
-        return
-      }else{
-        var parmas={
-          uid:this.userid,
-          pk:item.id,
-        }
+      var parmas={
+        uid:this.userid,
+        pk:item.id,
       }
       this.loading = true;
       this.$api.get(baseURL.sapi+'Course/details', parmas, response => {
         // console.log(JSON.stringify(response.data));
         this.loading = false;
+        if(item.type==1){
+         //CC视屏
+          let page = "courseDetailsZb.html";
+          let ow = plus.webview.create(
+            page,
+            page,
+            {
+              popGesture: "close"
+            },
+            {
+              videoData: response.data,
+            }
+          );
+          ow.onloading = () => {
+            plus.nativeUI.showWaiting();
+            // ow.show("pop-in", 250);
+          };
+          // this.openAlert('抱歉,亲~！当前课程为直播课，开发小哥正在紧急开发APP直播系统中，请前往网站观看~')
+          return
+        }
         if(response.data.vData.video_type==0){
           this.openAlert("抱歉，亲~！当前课程暂不支持APP播放，请前往网站观看~")
           //腾讯云----在不跳转

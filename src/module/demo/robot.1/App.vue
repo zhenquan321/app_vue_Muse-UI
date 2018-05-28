@@ -83,8 +83,6 @@
         //先去本地找找看有没有 女朋友记录
         //let cc = new Cache('my_friends')
 
-
-
         // new 一个女朋友...
         this.gf = new GF(this.robotInfo.name)
         

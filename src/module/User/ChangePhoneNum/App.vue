@@ -9,7 +9,7 @@
         <h5>更换绑定的手机号之后可以用新手机号及当前密码登录</h5>
         <div>
           <mu-text-field label="请输入原手机号" type="number" @textOverflow="handleInputOverflow(1)" :maxLength="11" class="inputC" fullWidth  :errorText="errorText1"  v-model="oldPhone" labelFloat/>
-          <mu-raised-button  label="获取验证码"  @click="sendMobileCodeNew()" class="getAZM demo-raised-button"/><br/>
+          <mu-raised-button :disabled="VCdisabled"  :label="VerificationCode"  @click="sendMobileCodeNew()" class="getAZM demo-raised-button"/><br/>
           <mu-text-field label="验证码" type="number"  @textOverflow="handleInputOverflow(2)" :maxLength="6" class="inputC mt15-" fullWidth :errorText="errorText2" v-model="mobile_code1" labelFloat/><br/>
         </div>
         <mu-raised-button class="quere mt10" @click="toggle()" label="下一步" fullWidth />
@@ -17,7 +17,7 @@
       <div id="changeEmail" v-if="typeS==1">
           <div>
             <mu-text-field label="请输入手机号" type="number" @textOverflow="handleInputOverflow(3)" :maxLength="11" class="inputC " fullWidth :errorText="errorText3" v-model="oldPhone" labelFloat/>
-            <mu-raised-button label="获取验证码" style="top:50px!important"  @click="sendMobileCodeNew()" class="getAZM demo-raised-button"/><br/>
+            <mu-raised-button :disabled="VCdisabled"  :label="VerificationCode" style="top:50px!important"  @click="sendMobileCodeNew()" class="getAZM demo-raised-button"/><br/>
             <mu-text-field label="验证码" type="number"  @textOverflow="handleInputOverflow(4)" :maxLength="6" class="inputC mt15-" fullWidth :errorText="errorText4" v-model="mobile_code1"  labelFloat/><br/>
           </div>
           <mu-raised-button class="quere mt10" @click="bindingMobile()" label="立即绑定" fullWidth />
@@ -29,7 +29,7 @@
             <h5>更换绑定的手机号之后可以用新手机号及当前密码登录</h5>
             <div>
               <mu-text-field label="请输入新手机号" type="number" @textOverflow="handleInputOverflow(3)" :maxLength="11" class="inputC " fullWidth :errorText="errorText3" v-model="newPhone" labelFloat/>
-              <mu-raised-button label="获取验证码" @click="sendMobileCodeNew()" class="getAZM demo-raised-button"/><br/>
+              <mu-raised-button :disabled="VCdisabled"  :label="VerificationCode" @click="sendMobileCodeNew()" class="getAZM demo-raised-button"/><br/>
               <mu-text-field label="验证码" type="number"  @textOverflow="handleInputOverflow(4)" :maxLength="6" class="inputC mt15-" fullWidth :errorText="errorText4" v-model="mobile_code2"  labelFloat/><br/>
             </div>
             <mu-raised-button class="quere mt10" @click="replaceMobile()" label="立即绑定" fullWidth />
@@ -72,6 +72,10 @@ export default {
       newPhone:'',
       mobile_code1:'',
       mobile_code2:'',
+      VCdisabled:false,
+      VerificationCode:"发送验证码",
+      VCtime:60,
+      Stime:'',
       regex:/^1([358][0-9]|4[579]|66|7[0135678]|9[89])[0-9]{8}$/
     };
   },
@@ -118,6 +122,21 @@ export default {
         this.loading = false;
         this.showToast(failure.err_msg);
       })
+    },
+    //验证码倒计时
+    VerificationCodeFun(){
+        if(this.VCtime>0){
+          this.VCdisabled=true;
+          this.VerificationCode=this.VCtime+"s";
+          this.VCtime--
+          this.Stime =setTimeout(()=>{
+            this.VerificationCodeFun()
+          },1000)
+        }else{
+           this.VCtime=60;
+           this.VCdisabled=false;
+           this.VerificationCode="发送验证码";
+        }
     },
     //获取验证码
     sendMobileCodeNew() {
@@ -186,6 +205,7 @@ export default {
       this.$api.get(baseURL.api_v1+'Service/sendMobileCode', parmas, response => {
         this.loading = false;
         this.showToast("验证码已发送，请稍等");
+        this.VerificationCodeFun()
       },
       failure => {
         this.loading = false;
@@ -220,8 +240,13 @@ export default {
       }
       parmas = sign.signAfterObj(parmas);
       this.$api.get(baseURL.api_v1+'Userregister/verifyMobileCode', parmas, response => {
-        this.loading = false;
+        clearTimeout(this.Stime)
+        this.VCdisabled=false;
+        this.VerificationCode="发送验证码";
+        this.VCtime=60;
         this.openChouti = true;
+        this.loading = false;
+        
       },
       failure => {
         this.loading = false;
@@ -299,6 +324,7 @@ export default {
     },
     //更新抽屉
     toggle (num) {
+ 
       this.verifyMobileCode();
     },
     //提示

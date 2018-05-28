@@ -8,14 +8,33 @@
     <div>
       <div class="p8">
         <mu-card class="videoBoxD">
-           <mu-card-media style="position: absolute;">
-            <img src="../static/img/loading.gif" />
-           </mu-card-media>
-          <div id="videoBox" ref="myVideoBox"></div>
+            <mu-card-media class="bjCard">
+              <!-- <img :src="curseDatajs.coverpath"/> -->
+              <img src="https://s.test.mysipo.com/manage/Uploads/Picture/2018-05-12/5af646c05995f.jpg"/>
+            </mu-card-media>
+           <div class="infoCard">
+              <div v-show="curseDatajs.status==2">
+                <img src="../static/img/zmz.png"  class="mt5" alt="">
+                <h4>视频转码中，请稍后...</h4> 
+              </div>
+              <div  v-show="curseDatajs.status==0">
+                <img src="../static/img/ddzb.png" class="ml5 mt10" alt="">
+                <h5>等待直播</h5> 
+                <h4>{{curseDatajs.start_time}}开始直播</h4> 
+              </div>
+              <div v-show="curseDatajs.status==1">
+                <img src="../static/img/zbz.png" alt="">
+                <h5>直播中</h5> 
+                <span @click="guLiXx()">
+                  立即学习
+                </span>
+              </div>
+           </div>
+          <!-- <div id="videoBox" ref="myVideoBox"></div> -->
         </mu-card>
-        <mu-tabs :value="activeTab" @change="handleTabChange">
-          <mu-tab value="tab1" title="课程简介"/>
-          <mu-tab value="tab2" title="课程列表"/>
+        <mu-tabs :value="activeTab">
+          <mu-tab  value="tab1" class="w100" title="课程简介"/>
+          <!-- <mu-tab value="tab2" title="课程列表"/> -->
         </mu-tabs>
       </div>
       <div class="p8 pt0" v-if="activeTab === 'tab1'">
@@ -35,7 +54,6 @@
               <h4>课程简介</h4>
               <div class="pt15">
                 <div v-html="curseDatajs.introduce">
-
                 </div>
                 <!-- <h5>针对人群</h5>
                 <p>
@@ -169,10 +187,10 @@
       }
     },
     mounted() {
-      const s = document.createElement('script');
-      s.type = 'text/javascript';
-      s.src = this.courseData.videoUrl;
-      document.getElementById("videoBox").appendChild(s);
+      // const s = document.createElement('script');
+      // s.type = 'text/javascript';
+      // s.src = this.courseData.videoUrl;
+      // document.getElementById("videoBox").appendChild(s);
     },
     created() {
       this.ready();
@@ -197,14 +215,15 @@
       },
       plusReady() {
         this.cw = plus.webview.currentWebview();
+        console.log(JSON.stringify(this.cw.videoData))
         this.courseDataList=this.cw.videoData.vlist;
         this.curseDatajs=this.cw.videoData.courseData;
-        for(var i=0;i< this.courseDataList.length;i++){
-          this.courseDataList[i].videoUrl = 'https://p.bokecc.com/player?vid='+ this.courseDataList[i].qcloud_id+'DC5901307461&siteid=D7C8C99121633982&autoStart=false&width=100%&height=250&playerid=08143C56E1D83AE6&playertype=1';
-          this.courseDataList[i].title = this.courseDataList[i].node_title
-          this.courseDataList[i].videoStart = false;
-        }
-        this.changVideo(this.courseDataList[0],0,true);
+        // for(var i=0;i< this.courseDataList.length;i++){
+        //   this.courseDataList[i].videoUrl = 'https://p.bokecc.com/player?vid='+ this.courseDataList[i].qcloud_id+'DC5901307461&siteid=D7C8C99121633982&autoStart=false&width=100%&height=250&playerid=08143C56E1D83AE6&playertype=1';
+        //   this.courseDataList[i].title = this.courseDataList[i].node_title
+        //   this.courseDataList[i].videoStart = false;
+        // }
+        // this.changVideo(this.courseDataList[0],0,true);
         // this.courseDataList[0].videoStart=true;
         // this.courseData = this.courseDataList[0];
         setTimeout(function () { 
@@ -230,7 +249,7 @@
         }
         //判断是否是仅wifi播放
         this.onlyWifi = plus.storage.getItem('onlyWifi')||1;
-        console.log(" this.onlyWifi:"+this.onlyWifi)
+        console.log("this.onlyWifi:"+this.onlyWifi)
         if(this.onlyWifi=="1"){
           setTimeout(() => {
             this.getListIng();
@@ -262,7 +281,7 @@
           this.activeTab="tab2";
         }
         this.courseData=this.courseDataList[index];
-        this.createVideo();
+        // this.createVideo();
       },
       //网络切换
       handleTabChange (val) {
@@ -319,8 +338,26 @@
         this.toast = false
         if (this.toastTimer) clearTimeout(this.toastTimer)
       },
-       
-      
+      //打开cc直播
+      guLiXx(){
+        let page = "../../view/video/ccLive.html";
+          plus.webview.hide(page)
+          plus.webview.close(page);
+          let ow = plus.webview.create(
+            page,
+            page,
+            {
+              popGesture: "close"
+            },
+            {
+              videoData: this.cw.videoData,
+            }
+          );
+          ow.onloading = () => {
+            plus.nativeUI.showWaiting();
+            // ow.show("pop-in", 250);
+          };
+      },
       //监测网络状态
       getListIng() {  
         var types = [];
@@ -334,7 +371,7 @@
         types[plus.networkinfo.CONNECTION_CELL4G] = "4G蜂窝网络";
         this.NetStateStr = types[num];
         // console.log( this.num);
-        console.log(this.NetStateStr);
+        // console.log(this.NetStateStr);
         if(this.NetStateStr=="3G蜂窝网络" || this.NetStateStr=="4G蜂窝网络"|| this.NetStateStr=="2G蜂窝网络"){
          console.log(this.player.paused)
          if(this.ifJT){

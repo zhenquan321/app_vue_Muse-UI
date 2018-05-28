@@ -9,17 +9,19 @@
       <div class="BGcard">
         <div class="wzLeft">
           <h4>{{userInfo.username}}<span class="MaleIcon">
-            <i class="fa fa-mars" v-if="userInfo.gender==1"  aria-hidden="true"></i>
+            <i class="fa fa-mars" v-if="userInfo.gender==1" aria-hidden="true"></i>
             <i class="fa fa-venus" v-if="userInfo.gender==2" aria-hidden="true"></i>
             <i class="fa fa-transgender" v-if="userInfo.gender!=1&&userInfo.gender!=2"  aria-hidden="true"></i>
           </span></h4>
-          <p v-if="userInfo.introduce">{{userInfo.introduce}}</p>
+          <p v-if="userInfo.introduce">{{userInfo.introduce2}}</p>
           <p v-if="!userInfo.introduce" class="noIntd">无个人简介</p>
         </div>
         <div class="tuRight" @click="openBottomSheet(4)">
+          <div>
             <img v-show="!userInfo.headimg"  src="https://bbs.mysipo.com//uc_server/avatar.php?uid=138880&size=small" alt="">
-            <img v-show="userInfo.headimg"  :src="userInfo.headimg" alt="">
-            <span  ><img src="../static/img/xiugai.png" alt=""></span>
+            <img v-show="userInfo.headimg"  :src="userInfo.headimg+'?imageView2/1/w/200/h/200/q/75|imageslim'"  alt="">
+          </div>
+          <span><img src="../static/img/xiugai.png" alt=""></span>
         </div>
       </div>
       <template>
@@ -34,7 +36,7 @@
               </mu-list-item>
               <mu-divider />
               <mu-list-item disableRipple  title="手机号">
-                <span slot="right" v-if="userInfo.mobile">{{userInfo.mobile}}</span>
+                <span slot="right" v-if="userInfo.mobile">{{userInfo.mobile2}}</span>
                 <span slot="right" v-if="!userInfo.mobile" @click="bindingPhone()">绑定手机号</span>
               </mu-list-item>
               <mu-divider />
@@ -60,7 +62,7 @@
           <div class="useInfoCard mt10">
             <mu-list >
               <mu-list-item disableRipple  title="工作年龄" class="nackname">
-                <input slot="right" class="Nage" maxlength="2"  type="nubmer" v-model="userInfo.worktime" placeholder="请输入工作年龄">
+                <input slot="right" class="Nage" maxlength="2"  type="nubmer"  @blur="SJsetMemberInfo()" v-model="userInfo.worktime" placeholder="请输入工作年龄">
               </mu-list-item>
               <mu-divider />
               <mu-list-item disableRipple  title="职业">
@@ -73,15 +75,13 @@
           <div class="useInfoCard mb10">
             <div class="zwjsCard">
               <h5>个人介绍</h5>
-              <textarea  id="" v-model="userInfo.introduce"  rows="4"></textarea>
+              <textarea id=""  maxlength=150 v-model="userInfo.introduce"  @blur="SJsetMemberInfo()"  rows="4"></textarea>
               <!-- <div></div> -->
             </div>
           </div>
         </mobile-tear-sheet>
       </template>
     </div>
-   
-  
     <template>
       <mu-bottom-sheet :open="bottomSheet==1" @close="closeBottomSheet">
         <mu-list @itemClick="closeBottomSheet" class="pt0 pb0">
@@ -127,7 +127,6 @@
         <mu-toast v-if="toast" :message="toastMasege" @close="hideToast"/> 
       </div>
     </template>
- 
     <template>
       <div>
         <mu-drawer right :open="openChouti" @close="toggle()" width="100%">
@@ -187,9 +186,11 @@ export default {
       Userprofessional:"",
       UserGender:'',
       token:'',
+      GZNX:"",
+      ZOJS:'',
       setnickname:'',
       index:-1,
-      tomStyle:false,
+      tomStyle:true,
       dialog: false,
       activeIndex:1,
       bottomSheet: 0,
@@ -207,12 +208,12 @@ export default {
         // "introduce": "",
         // "role": "",
         "uid": 133974,
-        "username": "T135xxxx6370Og",
-        "nickname": "君心",
-        "headimg": "http://qiniucdn.mysipo.com/ed9b61fd339f97449bb9ebf03dd4f51b.jpg",
-        "realname": "薛伟",
+        "username": "",
+        "nickname": "",
+        "headimg": "",
+        "realname": "",
         "idcard": "",
-        "mobile": "13520306370",
+        "mobile": "",
         "email": "",
         "worktime": "1",
         "professional": 0,
@@ -293,7 +294,7 @@ export default {
       console.log("缓存数据哦：" + JSON.stringify(this.sf.getLocalData()));
       //获取网络数据 下拉
       this.index = 1;
-      setTimeout(() => {  this.tomStyle=true }, 5000)
+      // setTimeout(() => {  this.tomStyle=true }, 5000)
     },
     plusReady() {
       this.cw = plus.webview.currentWebview();
@@ -351,9 +352,10 @@ export default {
       this.$api.get(baseURL.appapi_v2+'Index/getSettingInfo', parmas, response => {
         this.loading = false;
         console.log("sss"+JSON.stringify(response.data));
-        this.user_conf_role=response.data.user_conf.role
-        this.user_conf_gender=response.data.user_conf.gender
-        this.user_conf_profession=response.data.user_conf.profession
+        this.user_conf_role=response.data.user_conf.role;
+        this.user_conf_gender=response.data.user_conf.gender;
+        this.user_conf_profession=response.data.user_conf.profession;
+      
         this.getMemberInfo();
       },
       failure => {
@@ -365,9 +367,14 @@ export default {
     // 信息修改
     setMemberInfo() {
       this.loading = true;
+      if (this.userInfo.worktime==""){
+        var worktime=0;
+      }else{
+        var  worktime=this.userInfo.worktime;
+      }
       let parmas={
         token:this.token,
-        worktime:this.userInfo.worktime,
+        worktime:worktime,
         professional:this.userInfo.professional,
         introduce:this.userInfo.introduce,
         role:this.userInfo.role,
@@ -376,14 +383,28 @@ export default {
       console.log(JSON.stringify(parmas));
       this.$api.get(baseURL.appapi_v2+'Userinfo/setMemberInfo', parmas, response => {
         this.loading = false;
-        this.showToast("用户信息修改成功！")
-        //this.getMemberInfo();
+        setTimeout(() => {  
+          this.showToast("用户信息修改成功！")
+        }, 500); 
+        this.getMemberInfo();
       },
       failure => {
         this.loading = false;
         this.showToast(failure.err_msg);
-        
       })
+    },
+    //失焦设置用户信息
+    SJsetMemberInfo(){
+      if(Number(this.GZNX) !== Number(this.userInfo.worktime)){
+        console.log(this.GZNX);
+        console.log(this.userInfo.worktime);
+        this.setMemberInfo();
+      }
+      if(this.ZOJS !== this.userInfo.introduce){
+        console.log(this.GZNX);
+        console.log(this.userInfo.worktime);
+        this.setMemberInfo();
+      }
     },
     //
     closeBottomSheet () {
@@ -402,9 +423,21 @@ export default {
       this.$api.get(baseURL.appapi_v2+'Userinfo/getMemberInfo', parmas, response => {
         this.loading = false;
         this.userInfo=response.data;
+        this.userInfo.mobile2=  this.userInfo.mobile.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
+        if(this.userInfo.introduce.length>25){
+          this.userInfo.introduce2= this.userInfo.introduce.substring(0,25)+"...";
+        }else{
+          this.userInfo.introduce2= this.userInfo.introduce;
+        }
+        console.log( this.userInfo.introduce2)
         this.selUserRole();
         this.selUserprofessional();
         this.selgender();
+        this.GZNX= this.userInfo.worktime;
+        this.ZOJS= this.userInfo.introduce;
+        if(this.userInfo.worktime==0){
+          this.userInfo.worktime="";
+        }
         if( this.headimg!= this.userInfo.headimg){
           this.headimg= this.userInfo.headimg
           plus.storage.setItem('headimg',this.headimg);
@@ -415,7 +448,6 @@ export default {
         this.loading = false;
         this.noCase=true;
         this.showToast(failure.err_msg);
-        
       })
     },
     //下拉框选择
@@ -430,6 +462,7 @@ export default {
         this.userInfo.professional=data.id;
         this.selUserprofessional();
       }
+      this.setMemberInfo();  
     },
     //选择用户角色
     selUserRole(){
@@ -542,13 +575,13 @@ export default {
           this.ifUpload2();
         },300)
       }else{
-        this.userInfo.headimg=this.headimg;
-        // this.showToast("修改成功");
-        this.tomStyle=false;
-        setTimeout(() => { this.tomStyle=true }, 5000);
+        // this.userInfo.headimg=this.headimg;
+        this.getMemberInfo();
+        this.showToast("头像修改成功");
+        // this.tomStyle=false;
+        // setTimeout(() => { this.tomStyle=true }, 5000);
       }
     },
-
     closeBottomSheet () {
       this.bottomSheet = 0
     },
@@ -557,15 +590,15 @@ export default {
     }
   },
   watch: {
-    userInfo:{//深度监听，可监听到对象、数组的变化
-        handler(val, oldVal){
-          let _this = this;  
-          setTimeout(() => {  
-              _this.setMemberInfo();  
-          }, 500);  
-        },
-        deep:true
-    }
+    // userInfo:{//深度监听，可监听到对象、数组的变化
+    //     handler(val, oldVal){
+    //       let _this = this;  
+    //       setTimeout(() => {  
+    //           _this.setMemberInfo();  
+    //       }, 500);  
+    //     },
+    //     deep:true
+    // }
   }
 };
 </script>
@@ -627,5 +660,8 @@ export default {
 .mu-paper {
   background-color: #f0f1f4!important;
   color: rgba(0, 0, 0, 0.87);
+}
+.useInfoCard .mu-list .Nage{
+  line-height: 24px!important;
 }
 </style>

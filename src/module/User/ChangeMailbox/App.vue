@@ -9,7 +9,7 @@
         <h5>更换绑定的邮箱之后可以用新邮箱及当前密码登录</h5>
         <div>
           <mu-text-field label="请输入原邮箱账号"  class="inputC" fullWidth  :errorText="errorText1"  v-model="oldEmail" labelFloat/>
-          <mu-raised-button  label="获取验证码" @click="sendEmailCodeNew()" class="getAZM demo-raised-button"/><br/>
+          <mu-raised-button  :label="VerificationCode" @click="sendEmailCodeNew()" class="getAZM demo-raised-button" :disabled="VCdisabled" /><br/>
           <mu-text-field label="验证码"   @textOverflow="handleInputOverflow(2)" :maxLength="6"  class="inputC mt15-" fullWidth :errorText="errorText2" v-model="mobile_code1" labelFloat/><br/>
         </div>
         <mu-raised-button class="quere mt10" @click="toggle()" label="下一步" fullWidth />
@@ -17,7 +17,7 @@
       <div id="changeEmail" v-if="typeS==1">
         <div>
           <mu-text-field label="请输入邮箱账号"   class="inputC" fullWidth  :errorText="errorText1"  v-model="oldEmail" labelFloat/>
-          <mu-raised-button  label="获取验证码" @click="sendEmailCodeNew()" class="getAZM demo-raised-button " style="top:50px!important" /><br/>
+          <mu-raised-button  :label="VerificationCode" @click="sendEmailCodeNew()" class="getAZM demo-raised-button " style="top:50px!important" :disabled="VCdisabled" /><br/>
           <mu-text-field label="验证码"   @textOverflow="handleInputOverflow(2)" :maxLength="6" class="inputC mt15-" fullWidth :errorText="errorText2" v-model="mobile_code1" labelFloat/><br/>
         </div>
         <mu-raised-button class="quere mt10" @click="bindingEmail()" label="立即绑定" fullWidth />
@@ -29,7 +29,7 @@
             <h5>更换绑定的邮箱之后可以用新邮箱及当前密码登录</h5>
             <div>
               <mu-text-field label="请输入新邮箱"  class="inputC " fullWidth :errorText="errorText3" v-model="newEmail" labelFloat/>
-              <mu-raised-button label="获取验证码" @click="sendEmailCodeNew()" class="getAZM demo-raised-button"/><br/>
+              <mu-raised-button :label="VerificationCode" @click="sendEmailCodeNew()" class="getAZM demo-raised-button" :disabled="VCdisabled" /><br/>
               <mu-text-field label="验证码"   @textOverflow="handleInputOverflow(4)" :maxLength="6" class="inputC mt15-" fullWidth :errorText="errorText4" v-model="mobile_code2"  labelFloat/><br/>
             </div>
             <mu-raised-button class="quere mt10" @click="replaceEmail()" label="立即绑定" fullWidth />
@@ -72,6 +72,10 @@ export default {
       newEmail:'',
       mobile_code1:'',
       mobile_code2:'',
+      VCdisabled:false,
+      VerificationCode:"发送验证码",
+      VCtime:60,
+      Stime:"",
       szReg:/^[\w\-\.]+@[\w\-\.]+(\.\w+)+$/,
     };
   },
@@ -121,12 +125,23 @@ export default {
         this.showToast(failure.err_msg);
       })
     },
+    //验证码倒计时
+    VerificationCodeFun(){
+        if(this.VCtime>0){
+          this.VCdisabled=true;
+          this.VerificationCode=this.VCtime+"s";
+          this.VCtime--
+          this.Stime = setTimeout(()=>{this.VerificationCodeFun()},1000)
+        }else{
+           this.VCtime=60;
+           this.VCdisabled=false;
+           this.VerificationCode="发送验证码";
+        }
+    },
     //获取验证码
     sendEmailCodeNew() {
       this.clearInfo();
-      
       if(this.typeS==1){
-      
         if(!this.oldEmail){
           console.log(this.newEmail)
           this.showToast("请输入邮箱");
@@ -135,7 +150,6 @@ export default {
         }
         if(!this.szReg.test(this.oldEmail)){
           this.showToast("请输入正确的邮箱");
-         
           return
         }
         var parmas={
@@ -191,6 +205,7 @@ export default {
       parmas = sign.signAfterObj(parmas);
       console.log(JSON.stringify(parmas));
       this.$api.get(baseURL.api_v1+'Service/sendEmail', parmas, response => {
+        this.VerificationCodeFun()
         this.loading = false;
         this.showToast("验证邮件已发送，请前去绑定邮箱查看");
       },
@@ -224,6 +239,10 @@ export default {
       parmas = sign.signAfterObj(parmas);
       console.log(JSON.stringify(parmas))
       this.$api.get(baseURL.api_v1+'Userregister/verifyEmailCode', parmas, response => {
+        clearTimeout(this.Stime)
+        this.VCdisabled=false;
+        this.VerificationCode="发送验证码";
+        this.VCtime=60;
         this.loading = false;
         this.openChouti = true;
       },
@@ -304,6 +323,7 @@ export default {
     },
     //更新抽屉
     toggle (num) {
+    
       this.verifyEmailCode();
     },
     //提示
