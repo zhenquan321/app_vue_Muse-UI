@@ -305,7 +305,6 @@ export default {
       this.token = plus.storage.getItem('token') ? plus.storage.getItem('token') : '';
       this.headimg = plus.storage.getItem('headimg') ? plus.storage.getItem('headimg') : '';
       this.getSettingInfo();
-     
     },
     //更新抽屉
     toggle (num) {

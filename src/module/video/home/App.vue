@@ -8,13 +8,13 @@
     <mu-divider/>
   </div>-->
   <div class="demo-infinite-container bgf0f1f4" id="courseList">
+    <mu-linear-progress  v-show='loading' />
     <div class="Secard">
       <mu-tabs :value="activeTab" @change="handleTabChange">
         <mu-tab value="tab1" title="课程"/>
         <mu-tab value="tab2" title="系列课"/>
       </mu-tabs>
     </div>
-
    <div class="" v-show="activeTab === 'tab1'">
       <mu-list id="KClist" class="pt0">
           <div v-for='(o,i) in list'>
@@ -162,10 +162,8 @@ export default {
         uid:this.userid,
         pk:item.id,
       }
-      this.loading = true;
       this.$api.get(baseURL.sapi+'Course/details', parmas, response => {
         // console.log(JSON.stringify(response.data));
-        this.loading = false;
         if(item.type==1){
          //CC视屏
           let page = "courseDetailsZb.html";
@@ -187,23 +185,23 @@ export default {
           return
         }
         if(response.data.vData.video_type==0){
-          this.openAlert("抱歉，亲~！当前课程暂不支持APP播放，请前往网站观看~")
+          // this.openAlert("抱歉，亲~！当前课程暂不支持APP播放，请前往网站观看~")
           //腾讯云----在不跳转
-          // let page = "../../view/video/videoTX.html",
-          // ow = plus.webview.create(
-          //   page,
-          //   page,
-          //   {
-          //     popGesture: "close"
-          //   },
-          //   {
-          //     videoData: response.data.data,
-          //   }
-          // );
-          // ow.onloading = () => {
-          //   plus.nativeUI.showWaiting();
-          //   // ow.show("pop-in", 250);
-          // };
+          let page = "courseDetailsTX.html",
+          ow = plus.webview.create(
+            page,
+            page,
+            {
+              popGesture: "close"
+            },
+            {
+              videoData: response.data,
+            }
+          );
+          ow.onloading = () => {
+            plus.nativeUI.showWaiting();
+            // ow.show("pop-in", 250);
+          };
         }else if(response.data.vData.video_type==1){
           //CC视屏
           let page = "courseDetails.html";
@@ -371,6 +369,10 @@ export default {
   text-align: center;
 }
 .mu-circle-ripple, .mu-ripple-wrapper{
-  height: 48px!important;
+  height: 50px!important;
+}
+.mu-tab-text{
+  position: relative;
+  top: 1px;
 }
 </style>

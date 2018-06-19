@@ -12,6 +12,10 @@
         <mu-text-field label="确认新密码"  class="inputC mt15-" fullWidth :errorText="errorText4" v-model="password_newq" labelFloat/><br/>
       </div>
       <mu-raised-button class="quere mt10" @click="editPass()" label="立即修改" fullWidth />
+      <div class="PswCard">
+        <p>
+          密码由6-21字母和数字组成，不能是纯数字或纯英文。</p>
+      </div>
     </div>
     <template>
       <div>
@@ -176,4 +180,16 @@ export default {
 #changeEmail div .t50{
   top:50!important;
 }
+.PswCard{
+  text-align: center;
+ 
+}
+ .PswCard p{
+    display: inline-block;
+    font-size: 12px;
+    color: #777;
+    background-color: #fafafa;
+    border: 1px dashed #ccc;
+    padding: 5px 10px;
+  }
 </style>

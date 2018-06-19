@@ -70,7 +70,7 @@
   import Broadcast from 'common/js/ning/Broadcast.js';
   import Cache from 'common/js/Base/Cache.js';
   
-   const broadcast = new Broadcast()
+  const broadcast = new Broadcast()
   export default {
     data() {
       return {
@@ -104,7 +104,7 @@
             //1251979435.vod2.myqcloud.com/541c52b5vodtransgzp1251979435/d4577320  4564972819276469972 4564972819276469972/v.f30.mp4
             //200007162.vod.myqcloud.com/200007162_5727b7e603ed11e6a8c3976cadb1b427.f30.mp4
             // mp4
-            src: "http://1251979435.vod2.myqcloud.com/541c52b5vodtransgzp1251979435/dc4cc2347447398154679527115/v.f20.mp4",
+            src: "http://play.video.qcloud.com/qrplayer.html?appid=1251979435&fileid=7447398156017044137&autoplay=0&sw=640&sh=426&$def=20&wmode=transparent",
             // webm
             // src: "https://cdn.theguardian.tv/webM/2015/07/20/150716YesMen_synd_768k_vp8.webm"
           }],

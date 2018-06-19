@@ -14,6 +14,8 @@ import plusReady from './plusReady.js'
 import style from '../../css/style.less'
 import fontAwesome from 'font-awesome-webpack'
 import VueResource from 'vue-resource'
+import rem from './rem.js'
+
 Vue.use(VueResource)
 Vue.use(MuseUI)
 

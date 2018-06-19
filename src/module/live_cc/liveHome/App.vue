@@ -248,7 +248,7 @@
           };
         }
         //判断是否是仅wifi播放
-        this.onlyWifi = plus.storage.getItem('onlyWifi')||1;
+        this.onlyWifi = plus.storage.getItem('onlyWifi')||"1";
         console.log(" this.onlyWifi:"+this.onlyWifi)
         if(this.onlyWifi=="1"){
           setTimeout(() => {

@@ -25,7 +25,7 @@
               <div v-show="curseDatajs.status==1">
                 <img src="../static/img/zbz.png" alt="">
                 <h5>直播中</h5> 
-                <span @click="guLiXx()">
+                <span @click="getListIng()">
                   立即学习
                 </span>
               </div>
@@ -78,10 +78,10 @@
     </template>
     <template>
       <div>
-        <mu-dialog :open="dialog" title="提示" @close="closeAlert">
-          当前网络为{{NetStateStr}}，是否继续播放？
-          <mu-flat-button slot="actions" primary @click="closeAlert(0)" label="取消"/>
-          <mu-flat-button slot="actions" primary @click="closeAlert(1)" label="确定"/>  
+        <mu-dialog :open="dialog" title="网络提示" @close="closeAlert">
+          当前网络为{{NetStateStr}}，是否采用{{NetStateStr}}观看直播？
+          <mu-flat-button slot="actions" primary @click="closeAlert(0)" label="取消观看"/>
+          <mu-flat-button slot="actions" primary @click="closeAlert(1)" label="确定观看"/>  
         </mu-dialog>
       </div>
     </template>
@@ -111,23 +111,6 @@
         toastMasege:'',
         onlyWifi:true,
         videoData:{},
-        courseDataList:[{
-          title:"2018相关法精讲训练班：考点精讲课",
-          titleDec:'相关法考试的重要考点讲解',
-          Teacher:'学院讲师',
-          courseDec:'拥有丰富经验的相关法考试讲师,该课程仅在系列出售',
-          img:'http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg',
-          videoUrl:"https://p.bokecc.com/player?vid=18F92307053FB84E9C33DC5901307461&siteid=6A19AAD6EABF585C&autoStart=false&width=100%&height=230&playerid=08143C56E1D83AE6&playertype=1",
-          videoStart:true,
-       },{
-          title:"2018相关法精讲训练班：考点精讲课",
-          titleDec:'相关法考试的重要考点讲解',
-          Teacher:'学院讲师',
-          courseDec:'拥有丰富经验的相关法考试讲师,该课程仅在系列出售',
-          img:'http://s.mysipo.com/manage/Uploads/Picture/2016-11-04/581bf1bbec660.jpg',
-          videoUrl:"https://p.bokecc.com/player?vid=9E672D7BC713BA499C33DC5901307461&siteid=6A19AAD6EABF585C&autoStart=false&width=100%&height=250&playerid=08143C56E1D83AE6&playertype=1",
-          videoStart:false,
-       }],
         courseData:{
           title:"2018相关法精讲训练班：考点精讲课",
           titleDec:'相关法考试的重要考点讲解',
@@ -248,13 +231,8 @@
           };
         }
         //判断是否是仅wifi播放
-        this.onlyWifi = plus.storage.getItem('onlyWifi')||1;
-        console.log("this.onlyWifi:"+this.onlyWifi)
-        if(this.onlyWifi=="1"){
-          setTimeout(() => {
-            this.getListIng();
-          }, 2000)
-        };
+        this.onlyWifi = plus.storage.getItem('onlyWifi')||"1";
+        console.log("this.onlyWifi:"+this.onlyWifi);
       },
       createVideo() {
         const s = document.createElement('script');
@@ -300,12 +278,10 @@
       closeAlert (num) {
         this.dialog = false;
         if(num==1){
-          this.ifJT=false;
-          this.player.play();
-        }else{
-          this.ifJT=true;
+          this.guLiXx();
+          let jxbf4g="1";
+          plus.storage.setItem("jxbf4g",jxbf4g);
         }
-        plus.screen.unlockOrientation(); //解除屏幕方向的锁定
       },
       close() {
         this.cw.close()
@@ -370,32 +346,13 @@
         types[plus.networkinfo.CONNECTION_CELL3G] = "3G蜂窝网络";
         types[plus.networkinfo.CONNECTION_CELL4G] = "4G蜂窝网络";
         this.NetStateStr = types[num];
-        // console.log( this.num);
-        // console.log(this.NetStateStr);
-        if(this.NetStateStr=="3G蜂窝网络" || this.NetStateStr=="4G蜂窝网络"|| this.NetStateStr=="2G蜂窝网络"){
-         console.log(this.player.paused)
-         if(this.ifJT){
-           if(!this.player.paused){
-            this.player.pause();
-            this.player.webkitExitFullScreen();;
-            //退出全屏
-            plus.screen.lockOrientation('portrait-primary'); 
-            plus.screen.lockOrientation('portrait');
-            this.openAlert();
-           }
-          }
+        if(this.onlyWifi=="1"&&(this.NetStateStr=="3G蜂窝网络" || this.NetStateStr=="4G蜂窝网络"|| this.NetStateStr=="2G蜂窝网络")){
+          this.openAlert();
         }else{
-          if(this.NetStateStr=="WiFi网络"){
-            if(!this.ifJT){
-              this.showToast('网络已切换为WiFi网络')
-            }
-            this.ifJT=true;
-          }
+          plus.storage.setItem("jxbf4g","");
+          this.guLiXx();
         }
-        let _this = this;  
-        setTimeout(() => {  
-            _this.getListIng();  
-        }, 2000);  
+     
       },  
     },
     watch: {
