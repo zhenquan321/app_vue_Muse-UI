@@ -48,7 +48,7 @@
           <div v-if="activeTab === 'tab2'" class="VideoList">
             <mu-list class="pt0 pb0">
               <div :index="index" v-for="(o,index) in courseDataList">
-                <mu-list-item :title="o.title" v-on:click="changVideo(o,index)">
+                <mu-list-item :title="o.title" v-on:click="changVideo(o,index,'',true)">
                   <mu-avatar v-show="o.videoStart" src="../static/img/kaishi.png" slot="rightAvatar"/>
                   <mu-avatar v-show="!o.videoStart" src="../static/img/nokaishi.png" slot="rightAvatar"/>
                 </mu-list-item>
@@ -78,6 +78,7 @@
 </template>
 <script>
   import {domReady,plusReady} from 'common/js/ning/index.js';
+  import Vue from 'vue';
   import Broadcast from 'common/js/ning/Broadcast.js';
   import Cache from 'common/js/Base/Cache.js';
   const broadcast = new Broadcast()
@@ -91,9 +92,11 @@
         bw: null,
         NetStateStr:"4G蜂窝网络",
         ifJT:true,
+        tcplayer:'',
         toast: false,
         toastMasege:'',
         onlyWifi:true,
+        player:'',
         videoData:{},
         courseDataList:[{
           title:"2018相关法精讲训练班：考点精讲课",
@@ -175,16 +178,12 @@
       s.type = 'text/javascript';
       s.src = "https://imgcache.qq.com/open/qcloud/video/tcplayer/tcplayer.min.js";
       document.getElementById("videoBox").appendChild(s);
-    
     },
     created() {
       this.ready();
       plusReady(this.plusReady);
     },
     computed: {
-      player() {
-         return this.$refs.playerContainerId;
-      },
       timeOut: {  
         set (val) {  
             this.$store.state.timeout.compileTimeout = val;  
@@ -208,13 +207,15 @@
           this.courseDataList[i].title = this.courseDataList[i].node_title
           this.courseDataList[i].videoStart = false;
         }
-        this.changVideo(this.courseDataList[0],0,true);
         // this.courseDataList[0].videoStart=true;
         // this.courseData = this.courseDataList[0];
         setTimeout(function () { 
           plus.webview.currentWebview().show('slide-in-right', 250);
           plus.nativeUI.closeWaiting();
-        }, 550);
+        }, 700);
+        setTimeout(()=>{
+          this.changVideo(this.courseDataList[0],0,true);
+        },200)
         //视屏旋转
         if(plus.os.name=="Android"){
           var self = plus.webview.currentWebview();
@@ -240,16 +241,26 @@
             this.getListIng();
           }, 2000)
         };
+        //获取play
+        this.player=this.$refs.playerContainerId;
       },
+   
       createVideo() {
-         var player = TCPlayer('player-container-id', { // player-container-id 为播放器容器ID，必须与html中一致
+          this.tcplayer = TCPlayer('player-container-id', { // player-container-id 为播放器容器ID，必须与html中一致
             fileID: this.courseData.qcloud_id, // 请传入需要播放的视频filID 必须
             appID: this.courseData.qcloud_app,// 请传入点播账号的appID 必须
             coverpath:this.courseData.coverpath,
+            plugins:{
+              ContinuePlay: { // 开启续播功能
+                auto: true, //[可选] 是否在视频播放后自动续播
+                text:'上次播放至 ', //[可选] 提示文案
+                btnText: '恢复播放' //[可选] 按钮文案
+              },
+            }
           });
       },
       //切换视频源
-      changVideo(data,index,type){
+      changVideo(data,index,type,ifReload){
         this.activeTab="tab1";
         for(var i=0;i<this.courseDataList.length;i++){
           if(i==index){
@@ -262,9 +273,15 @@
           this.activeTab="tab2";
         }
         this.courseData=this.courseDataList[index];
-        this.createVideo();
-     
+        if(ifReload){
+          this.tcplayer.loadVideoByID({fileID: this.courseData.qcloud_id, appID: this.courseData.qcloud_app})
+        }else{
+          this.createVideo();
+        }
       },
+    
+    
+     
       //网络切换
       handleTabChange (val) {
         this.activeTab = val;
@@ -335,9 +352,9 @@
         types[plus.networkinfo.CONNECTION_CELL4G] = "4G蜂窝网络";
         this.NetStateStr = types[num];
         // console.log( this.num);
-        console.log(this.NetStateStr);
+        // console.log(this.NetStateStr);
         if(this.NetStateStr=="3G蜂窝网络" || this.NetStateStr=="4G蜂窝网络"|| this.NetStateStr=="2G蜂窝网络"){
-         console.log(this.player.paused)
+        //  console.log(this.player.paused)
          if(this.ifJT){
            if(!this.player.paused){
             this.player.pause();

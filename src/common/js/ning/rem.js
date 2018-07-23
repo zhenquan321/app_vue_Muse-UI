@@ -9,7 +9,7 @@ const rem = function (doc, win) {
             if(clientWidth>=640){
                 docEl.style.fontSize = '100px';
             }else{
-                docEl.style.fontSize = 100 * (clientWidth / 640) + 'px';
+                docEl.style.fontSize = 100 * (clientWidth / 750) + 'px';
             }
         };
 
