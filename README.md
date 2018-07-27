@@ -5,13 +5,6 @@
 使用UI : [Muse-UI](https://museui.github.io/) 基于 Vue 2.0 和 Material Desigin 的 UI 组件库
 真机调试 : [HBuilder](http://www.dcloud.io/) HBuilder-飞速编码的极客工具
 
-关键字：
-
-1）换肤（支持webview多页面换肤）
-2）简易机器人聊天
-3）技术性文章浏览
-4）支持流应用版本
-
 
 ## 开始
 
@@ -33,5 +26,3 @@ npm run build
 
 集成vue-video-player
 
-15.打包图片背景地址不对
-16. axios  http地址  config配置   

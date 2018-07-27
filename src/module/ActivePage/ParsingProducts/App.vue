@@ -34,11 +34,13 @@
               <mu-col  class="mt10" width="50" tablet="30" desktop="25" v-for="(item,key) in DataList"> 
                 <div class="product">
                   <div class="imgCard">
-                      <img src="../static/img/jiexiCard.png" alt="">
-                      <span>{{item.years}}</span>
+                      <img v-show="tabActive==1" src="../static/img/jiexiCard.png" alt="">
+                      <img v-show="tabActive==2" src="../static/img/xiangguanfa.png" alt="">                      
+                      <span v-show="tabActive==1">{{item.years}}</span>
+                      <span class="xgfPic" v-show="tabActive==2">{{item.years}}年</span>
                   </div>
                   <div class="jiage">
-                      价格：<span>￥</span><span class="jgNum">19.9</span> 
+                      价格：<span>￥</span><span class="jgNum">{{priceDG}}</span> 
                       <mu-flat-button @click="goumai(item.years,0,tabActive)" v-show="item.buy_analysis_status==2" label="购买" class="demo-flat-button"/>
                       <mu-flat-button @click="chakan(item)" v-show="item.buy_analysis_status==1" label="查看" class="demo-flat-button haveGm"/>
                   </div>
@@ -68,7 +70,6 @@
         <img src="../static/img/dibu.png" alt="">
         <div class="bang">
             <mu-flat-button @click="ljzxBd()" label="" class="demo-flat-button" primary/>
-            
         </div>
         <div class="bang">
             <mu-flat-button @click="goumai('',3,tabActive)" label="" class="demo-flat-button" primary/>
@@ -93,6 +94,7 @@ export default {
       AlertMag:'非常抱歉~，当前课程为直播课，开发小哥正在紧急开发APP直播系统中，如着急，请转至电脑端查看！',
       userid:"",
       index: -1,
+      priceDG:9.90,
       loading: false,
       tabActive:1,
       scroller: null,
@@ -230,6 +232,10 @@ export default {
       this.backList = this.cw.backList;
       this.userid = plus.storage.getItem('userid') ? plus.storage.getItem('userid') : '';//'165319'
       this.token = plus.storage.getItem('token') ? plus.storage.getItem('token') : '';//'165319'
+      this.analysis_conf = plus.storage.getItem('analysis_conf') ? plus.storage.getItem('analysis_conf') : '';//'165319'
+      this.analysis_conf =JSON.parse(this.analysis_conf);
+      this.priceDG= this.analysis_conf.price[0].M12;
+      
       // this.userid ='189837';
       this.getTestpaperList();
       setTimeout(function () { 
@@ -319,7 +325,7 @@ export default {
       }
       this.$api.get(baseURL.appapi_v2+'Testpaper/getTestpaperList', parmas, response => {
         this.loading = false;
-        console.log(JSON.stringify(response.data));
+        // console.log(JSON.stringify(response.data));
         this.DataList=response.data.testpaper_list;
       },
       failure => {
@@ -557,5 +563,10 @@ export default {
 }
 #courseList{
   padding-top: 44px;
+}
+.xgfPic{
+    top: 0.19rem!important;
+    font-size: 0.235rem!important;
+    left: 0.29rem!important;
 }
 </style>

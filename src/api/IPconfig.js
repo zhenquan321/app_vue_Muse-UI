@@ -7,8 +7,8 @@ module.exports = {
     // api_v1:'https://api.test.mysipo.com/api_v1/',
     
     //正式地址___________________________________________
-    sapi:'http://sapi.mysipo.com/api_v1/',
-    appapi_v2:'http://appapi.mysipo.com/app_v2_new/',
-    api_v1:'https://api.mysipo.com/api_v1/',
+    sapi:'http://sapi.mysipo.com/api_v1/',  //冯涛涛
+    appapi_v2:'http://appapi.mysipo.com/app_v2_new/',  //薛伟
+    api_v1:'https://api.mysipo.com/api_v1/',  //薛伟
 
 }
